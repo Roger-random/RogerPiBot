@@ -19,6 +19,8 @@ config = config | 0x0003 # Packet serial mode
 config = config | 0x8000 # Multi-Unit mode
 rc.SetConfig(0x80, config)
 
+rc.SetPinFunctions(0x80, 2, 0, 0) # S3 = E-Stop, S4 = Disabled, S5 = Disabled
+
 rc.WriteNVM(0x80)
 
 rc.ReadEncM1(0x80)
