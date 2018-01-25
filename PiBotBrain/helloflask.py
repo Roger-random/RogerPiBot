@@ -8,4 +8,4 @@ def hello_world():
 	rc = Roboclaw("/dev/ttyACM0",115200)
 	rc.Open()
 	ver = rc.ReadVersion(0x80)
-	return "Hello, Flask World! " + ver[1]
+	return "Flask successfully communicated with " + ver[1]
