@@ -1,4 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
 	<h1>Connect menu</h1>
+	<form action="{{ url_for('connect_menu')}}" method=post>
+		<dl>
+			<dt>Serial Port:</dt>
+			<dd><input type=text size=30 name=port></dd>
+			<dd><input type=submit value=Connect></dd>
+		</dl>
+	</form>
 {% endblock %}
