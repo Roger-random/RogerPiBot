@@ -1,5 +1,17 @@
 {% extends "layout.html" %}
 {% block body %}
-	<h1>Root menu</h1>
-	<p>Roboclaw communication established with {{version}}</p>
+	{% if address is not none %}
+	<p>{{response}}</p>
+	<hr/>
+	{% endif %}
+	Talk to Roboclaw at address:
+	{% for newAddr in range(128,136) %}
+		{% if newAddr == address %}
+			<b>{{newAddr}}</b>
+		{% else %}
+			<a href="{{url_for('root_menu', address=newAddr)}}">
+				{{newAddr}}
+			</a>
+		{% endif %}
+	{% endfor %}
 {% endblock %}

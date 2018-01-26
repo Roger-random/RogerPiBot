@@ -33,20 +33,25 @@ def root_menu():
 	if rc is None:
 		return redirect(url_for('connect_menu'))
 	addrParam = request.args.get('address')
-	rcAddr = tryParseAddress(addrParam, 0x80)
-	ret = rc.ReadVersion(rcAddr)
-	if ret[0]==1:
-		versionText = ret[1]
-		return render_template("root_menu.html", version=versionText)
+	rcAddr = tryParseAddress(addrParam, default=None)
+
+	if rcAddr is not None:
+		ret = rc.ReadVersion(rcAddr)
+		if ret[0]==1:
+			roboResponse = "Roboclaw at address {0} ({0:#x}) version: {1}".format(rcAddr, ret[1])
+		else:
+			roboResponse = "No Roboclaw response from address {0} ({0:#x})".format(rcAddr)
 	else:
-		flash("No Roboclaw responded at address " + str(rcAddr) + " (" + hex(rcAddr) + ")")
-		return redirect(url_for('root_menu'))
+		roboResponse = None			
+
+	return render_template("root_menu.html", response=roboResponse, address=rcAddr)
 
 
 # Connect menu let's the user specify serial port parameters for creating
 # a Roboclaw object
 @app.route('/connect', methods=['GET', 'POST'])
 def connect_menu():
+	global rc
 	if request.method == 'GET':
 		if rc is None:
 			return render_template("connect_menu.html")
@@ -57,12 +62,12 @@ def connect_menu():
 		newrc = Roboclaw(portName,115200)
 		ret = newrc.Open()
 		if ret == 1:
-			global rc
 			rc = newrc
 			flash("Roboclaw API connected to " + portName)
-			return redirect(url_for('root_menu', address="0x81"))
+			return redirect(url_for('root_menu', address="0x80"))
 		else:
 			flash("Roboclaw API could not open " + portName)
 			return redirect(url_for('connect_menu'))
 	else:
-		return "Unexpected method on connect"
+		flash("Unexpected request method on connect")
+		return redirect(url_for('connect_menu'))
