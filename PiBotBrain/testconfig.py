@@ -19,11 +19,14 @@ rc = None
 def root_menu():
 	if rc is None:
 		return redirect(url_for('connect_menu'))
-	ret = rc.ReadVersion(0x80)
+	rcAddr = 0x80
+	ret = rc.ReadVersion(rcAddr)
 	if ret[0]==1:
 		versionText = ret[1]
 		return render_template("root_menu.html", version=versionText)
-	return "Error encountered reading version from Roboclaw"
+	else:
+		flash("No Roboclaw responded at address " + str(rcAddr))
+		return redirect(url_for('root_menu'))
 
 
 # Connect menu let's the user specify serial port parameters for creating
@@ -36,15 +39,16 @@ def connect_menu():
 		else:
 			return redirect(url_for('root_menu'))
 	elif request.method == 'POST':
-		newrc = Roboclaw(request.form['port'],115200)
+		portName = request.form['port']
+		newrc = Roboclaw(portName,115200)
 		ret = newrc.Open()
 		if ret == 1:
 			global rc
 			rc = newrc
-			flash("Roboclaw API connected to specified serial port")
+			flash("Roboclaw API connected to " + portName)
 			return redirect(url_for('root_menu'))
 		else:
-			flash("could not open specified port")
+			flash("Roboclaw API could not open " + portName)
 			return redirect(url_for('connect_menu'))
 	else:
 		return "Unexpected method on connect"

@@ -1,11 +1,23 @@
 {% extends "layout.html" %}
 {% block body %}
 	<h1>Connect menu</h1>
+	<p>
+		Select one of the common values below, or type in name of a port, then click "Connect": 
+		<ul>
+		<li><button onclick="document.getElementById('serialPortInput').value='/dev/ttyS0'">Raspberry Pi mini UART</button></li>
+		<li><button onclick="document.getElementById('serialPortInput').value='/dev/ttyAMA0'">Raspberry Pi PL011</button></li>
+		<li><button onclick="document.getElementById('serialPortInput').value='/dev/ttyACM0'">Ubuntu USB Serial</button></li>
+		<li><button onclick="document.getElementById('serialPortInput').value='/dev/tty.usbmodem'">MacOS USB Serial</button></li>
+		<li><button onclick="document.getElementById('serialPortInput').value='/dev/ttyS3'">WSL passthrough USB Serial COM3</button></li>
+		<li><button onclick="document.getElementById('serialPortInput').value='COM3'">Windows USB Serial COM3</button></li>
+		</ul>
+	</p>
+	<br/>
 	<form action="{{ url_for('connect_menu')}}" method=post>
 		<dl>
-			<dt>Serial Port:</dt>
-			<dd><input type=text size=30 name=port></dd>
-			<dd><input type=submit value=Connect></dd>
+			Serial Port:
+			<input type=text size=30 name=port id="serialPortInput">
+			<input type=submit value=Connect>
 		</dl>
 	</form>
 {% endblock %}
