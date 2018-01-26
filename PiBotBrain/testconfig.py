@@ -59,7 +59,10 @@ def connect_menu():
 			return redirect(url_for('root_menu'))
 	elif request.method == 'POST':
 		portName = request.form['port']
-		newrc = Roboclaw(portName,115200)
+		baudrate = int(request.form['baudrate'])
+		interCharTimeout = float(request.form['interCharTimeout'])
+		retries = int(request.form['retries'])
+		newrc = Roboclaw(portName,baudrate,interCharTimeout,retries)
 		ret = newrc.Open()
 		if ret == 1:
 			rc = newrc
