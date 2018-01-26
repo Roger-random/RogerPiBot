@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h1>General Configurations Menu</h1>
+	<a href="{{url_for('root_menu', address=rcAddr)}}">Back</a>
+	
+	<p>Roboclaw version {{rcVersion}}</p>
+	<form action="{{ url_for('config_menu')}}" method="post">
+		<table>
+			<tr>
+				<td colspan="3">Configuration Flags</td>
+				<td><input type="text" size="20" value="{{rcConfig}}"/></td>
+			</tr>
+			<tr>
+				<td colspan="2">Main Battery</td>
+				<td>Min</td>
+				<td><input type="number" value="{{VmainMin}}"/></td>
+				<td>Max</td>
+				<td><input type="number" value="{{VmainMax}}"/></td>
+			</tr>
+			<tr>
+				<td colspan="3">PWM Mode</td>
+				<td colspan="3"><input type=number value="{{pwmMode}}"/></td>
+			</tr>
+			<tr>
+				<td>S3</td>
+				<td><input type="number" value="{{s3}}"/></td>
+				<td>S4</td>
+				<td><input type="number" value="{{s4}}"/></td>
+				<td>S5</td>
+				<td><input type="number" value="{{s5}}"/></td>
+			</tr>
+			<tr>
+				<td colspan="2">Max Current</td>
+				<td>M1</td>
+				<td><input type="number" value="{{AmaxM1}}"/></td>
+				<td>M2</td>
+				<td><input type="number" value="{{AmaxM2}}"/></td>
+			</tr>
+			<tr>
+				<td colspan="2">Encoder Mode</td>
+				<td>M1</td>
+				<td><input type="number" value="{{encModeM1}}"/></td>
+				<td>M2</td>
+				<td><input type="number" value="{{encModeM2}}"/></td>
+			</tr>
+
+			<tr>
+				<td colspan="6"><input type="submit" value="Update"></td>
+			</tr>
+		</table>
+	</form>
+{% endblock %}
