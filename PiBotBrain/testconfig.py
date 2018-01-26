@@ -32,19 +32,20 @@ def tryParseAddress(addressString, default):
 def root_menu():
 	if rc is None:
 		return redirect(url_for('connect_menu'))
-	addrParam = request.args.get('address')
-	rcAddr = tryParseAddress(addrParam, default=None)
+	rcAddr = tryParseAddress(request.args.get('address'), default=None)
 
+	displayMenu = False
 	if rcAddr is not None:
 		ret = rc.ReadVersion(rcAddr)
 		if ret[0]==1:
 			roboResponse = "Roboclaw at address {0} ({0:#x}) version: {1}".format(rcAddr, ret[1])
+			displayMenu = True
 		else:
 			roboResponse = "No Roboclaw response from address {0} ({0:#x})".format(rcAddr)
 	else:
-		roboResponse = None			
+		roboResponse = None
 
-	return render_template("root_menu.html", response=roboResponse, address=rcAddr)
+	return render_template("root_menu.html", response=roboResponse, display=displayMenu, address=rcAddr)
 
 
 # Connect menu let's the user specify serial port parameters for creating
@@ -74,3 +75,31 @@ def connect_menu():
 	else:
 		flash("Unexpected request method on connect")
 		return redirect(url_for('connect_menu'))
+
+# Config menu pulls down the current values of the general settings we care 
+# about and lets the user put in new ones.
+@app.route('/config', methods=['GET', 'POST'])
+def config_menu():
+	global rc
+	if rc is None:
+		return redirect(url_for('root_menu'))
+
+	rcAddr = tryParseAddress(request.args.get('address'), default=None)
+
+	if rcAddr is not None:
+		if request.method == 'GET':
+			return config_read()
+		elif request.method == 'POST':
+			return config_update()
+		else:
+			return redirect(url_for('config_menu'))
+	else:
+		return redirect(url_for('root_menu'))
+
+# Retrieve all the settings so we can show them in the rendered template.
+def config_read():
+	return "Placeholder - Roboclaw configurations"
+
+# Send values to Roboclaw
+def config_update():
+	return redirect(url_for('config_menu'))

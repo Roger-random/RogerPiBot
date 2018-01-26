@@ -1,8 +1,13 @@
 {% extends "layout.html" %}
 {% block body %}
 	{% if address is not none %}
-	<p>{{response}}</p>
-	<hr/>
+		<p>{{response}}</p>
+		{% if display %}
+			<a href="{{url_for('config_menu', address=address)}}">Configuration</a>
+			<a href="#">Velocity</a>
+			<a href="#">Position</a>
+		{% endif %}
+		<hr/>
 	{% endif %}
 	Talk to Roboclaw at address:
 	{% for newAddr in range(128,136) %}
