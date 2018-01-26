@@ -14,18 +14,32 @@ app.secret_key = os.urandom(24)
 # we are catering to a single user instance it is an ugly but sufficient hack.
 rc = None
 
+def tryParseAddress(addressString, default):
+	if addressString is None:
+		return default
+
+	try:
+		retVal = int(addressString)
+	except ValueError:
+		try:
+			retVal = int(addressString,16)
+		except ValueError:
+			retVal = default
+	return retVal
+
 # Root menu
 @app.route('/')
 def root_menu():
 	if rc is None:
 		return redirect(url_for('connect_menu'))
-	rcAddr = 0x80
+	addrParam = request.args.get('address')
+	rcAddr = tryParseAddress(addrParam, 0x80)
 	ret = rc.ReadVersion(rcAddr)
 	if ret[0]==1:
 		versionText = ret[1]
 		return render_template("root_menu.html", version=versionText)
 	else:
-		flash("No Roboclaw responded at address " + str(rcAddr))
+		flash("No Roboclaw responded at address " + str(rcAddr) + " (" + hex(rcAddr) + ")")
 		return redirect(url_for('root_menu'))
 
 
@@ -46,7 +60,7 @@ def connect_menu():
 			global rc
 			rc = newrc
 			flash("Roboclaw API connected to " + portName)
-			return redirect(url_for('root_menu'))
+			return redirect(url_for('root_menu', address="0x81"))
 		else:
 			flash("Roboclaw API could not open " + portName)
 			return redirect(url_for('connect_menu'))
