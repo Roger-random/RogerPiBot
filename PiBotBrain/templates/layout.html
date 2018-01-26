@@ -4,6 +4,7 @@
 <div class=page>
 	{% for message in get_flashed_messages() %}
 		<div class=flash>{{message}}</div>
+		<hr/>
 	{% endfor %}
 	{% block body %}{% endblock %}
 </div>

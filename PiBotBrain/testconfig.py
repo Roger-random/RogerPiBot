@@ -14,18 +14,54 @@ app.secret_key = os.urandom(24)
 # we are catering to a single user instance it is an ugly but sufficient hack.
 rc = None
 
+# Parse the given address parameter which may be normal integer or hexadecimal.
+# Returns only if value falls in the range of valid Roboclaw addresses.
 def tryParseAddress(addressString, default):
 	if addressString is None:
 		return default
 
+	retVal = None
 	try:
 		retVal = int(addressString)
 	except ValueError:
 		try:
 			retVal = int(addressString,16)
 		except ValueError:
-			retVal = default
+			retVal = None
+
+	if retVal is None or retVal < 128 or retVal > 135:
+		return default
+
 	return retVal
+
+# Helper function to be called before each of the user menu is displayed.
+# Verifies that a global Roboclaw API object is available and that there
+# is a Roboclaw responding at the address parameter.
+# If successful, returns a tuple of the Roboclaw API object (which is 
+# currently global but that's a bug to be fixed later) and the validated
+# address.
+# In case of failure, an error message is placed into flash and an exception
+# is raised. (ValueError for now, possibly a custom RoboclawError later.)
+def checkRoboclawAddress():
+	global rc
+	# Do we have Roboclaw API object?
+	if rc is None:
+		flash("Roboclaw API not initialized")
+		raise ValueError
+
+	# Do we have a Roboclaw address?
+	rcAddr = tryParseAddress(request.args.get('address'), default=None)
+	if rcAddr is None:
+		flash("Valid address parameter required")
+		raise ValueError
+
+	# Is there a Roboclaw at that address?
+	versionQuery = rc.ReadVersion(rcAddr)
+	if versionQuery[0] == 0:
+		flash("No Roboclaw response at {0} ({0:#x})".format(rcAddr))
+		raise ValueError
+
+	return (rc, rcAddr)
 
 # Root menu
 @app.route('/')
@@ -59,10 +95,13 @@ def connect_menu():
 		else:
 			return redirect(url_for('root_menu'))
 	elif request.method == 'POST':
+		# TODO sanity validation of these values from the HTML form
 		portName = request.form['port']
 		baudrate = int(request.form['baudrate'])
 		interCharTimeout = float(request.form['interCharTimeout'])
 		retries = int(request.form['retries'])
+
+		# Create the Roboclaw object against the specified serial port
 		newrc = Roboclaw(portName,baudrate,interCharTimeout,retries)
 		ret = newrc.Open()
 		if ret == 1:
@@ -80,26 +119,24 @@ def connect_menu():
 # about and lets the user put in new ones.
 @app.route('/config', methods=['GET', 'POST'])
 def config_menu():
-	global rc
-	if rc is None:
-		return redirect(url_for('root_menu'))
+	try:
+		rcAndAddr = checkRoboclawAddress()
 
-	rcAddr = tryParseAddress(request.args.get('address'), default=None)
-
-	if rcAddr is not None:
+		# We have Roboclaw API object pointing to a Roboclaw that responds.
+		# Delegate further action to the appropriate helper method.
 		if request.method == 'GET':
-			return config_read()
+			return config_read(*rcAndAddr)
 		elif request.method == 'POST':
-			return config_update()
+			return config_update(*rcAndAddr)
 		else:
 			return redirect(url_for('config_menu'))
-	else:
+	except ValueError as ve:
 		return redirect(url_for('root_menu'))
 
 # Retrieve all the settings so we can show them in the rendered template.
-def config_read():
+def config_read(rc, rcAddr):
 	return "Placeholder - Roboclaw configurations"
 
 # Send values to Roboclaw
-def config_update():
+def config_update(rc, rcAddr):
 	return redirect(url_for('config_menu'))
