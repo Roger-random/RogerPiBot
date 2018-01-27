@@ -270,6 +270,21 @@ def velocity_menu():
 	try:
 		rc,rcAddr = checkRoboclawAddress()
 
+		m1P, m1I, m1D, m1qpps = readResult(ReadM1VelocityPID(rcAddr))
+		m2P, m2I, m2D, m2qpps = readResult(ReadM2VelocityPID(rcAddr))
+
+		# Roboclaw API returns P/I/D as floating point even though it only accepts integers.
+		# To remain consistent even when the API is not, turn them to integers.
+		m1P = int(m1P)
+		m2P = int(m2P)
+		m1I = int(m1I)
+		m2I = int(m2I)
+		m1D = int(m1D)
+		m2D = int(m2D)
+
+		m1enc, m1encStatus = readResult(rc.ReadEncM1(rcAddr), "Read M1 Encoder")
+		m2enc, m2encStatus = readResult(rc.ReadEncM2(rcAddr), "Read M2 encoder")
+
 		if request.method == 'GET':
 			return("Velocity menu  not yet implemented, placeholder only.")
 		elif request.method == 'POST':
