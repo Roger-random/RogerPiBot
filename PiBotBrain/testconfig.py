@@ -222,8 +222,6 @@ def config_menu():
 
 			if configUpdated:
 				writeResult(rc.WriteNVM(rcAddr), "Write to non-volatile memory")
-				writeResult(rc.SetM1VelocityPID(0x80, 15000, 1000, 500, 3000), "Update M1 velocity PID")
-				writeResult(rc.SetM2VelocityPID(0x80, 15000, 1000, 500, 3000), "Update M2 velocity PID")
 
 			return redirect(url_for('config_menu',address=rcAddr))
 		else:
@@ -298,7 +296,29 @@ def velocity_menu():
 				m2enc=m2enc, m2encStatus=m2encStatus,
 				m1speed=m1speed, m2speed=m2speed)
 		elif request.method == 'POST':
-			flash(errorPrefix + "Velocity POST not yet implemented, placeholder only.")
+			# TODO sanity validation of these values from the HTML form
+			fm1P = int(request.form['m1P'])
+			fm1I = int(request.form['m1I'])
+			fm1D = int(request.form['m1D'])
+			fm1qpps = int(request.form['m1qpps'])
+
+			if request.form['m2values'] == 'copym1':
+				fm2P = fm1P
+				fm2I = fm1I
+				fm2D = fm1D
+				fm2qpps = fm1qpps
+			else:
+				fm2P = int(request.form['m2P'])
+				fm2I = int(request.form['m2I'])
+				fm2D = int(request.form['m2D'])
+				fm2qpps = int(request.form['m2qpps'])
+
+			if fm1P != m1P or fm1I != m1I or fm1D != m1D or fm1qpps != m1qpps:
+				writeResult(rc.SetM1VelocityPID(rcAddr, fm1P, fm1I, fm1D, fm1qpps), "Update M1 velocity PID")
+
+			if fm2P != m2P or fm2I != m2I or fm2D != m2D or fm2qpps != m2qpps:
+				writeResult(rc.SetM2VelocityPID(rcAddr, fm2P, fm2I, fm2D, fm2qpps), "Update M2 velocity PID")
+
 			return redirect(url_for('velocity_menu',address=rcAddr))
 		else:
 			flash(errorPrefix + "Unexpected request.method on velocity")
@@ -311,7 +331,11 @@ def run_velocity():
 	try:
 		rc,rcAddr = checkRoboclawAddress()
 
-		flash(errorPrefix + "Run @ velocity not yet implemented.")
+		session['m1speed'] = m1speed = int(request.form['m1speed'])
+		session['m2speed'] = m2speed = int(request.form['m2speed'])
+
+		writeResult(rc.SpeedM1M2(rcAddr, m1speed, m2speed), "Run M1+M2 at velocity")
+
 		return redirect(url_for('velocity_menu',address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
