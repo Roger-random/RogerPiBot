@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h1>Error Code {{"0x%x" | format(errorCode)}}</h1>
+	{% if errorCode == 0 %}
+		No error
+	{% else %}
+		Check manual for error code (decoding functionality not yet implemented)
+	{% endif %}
+	<hr/>
+	<a href="{{url_for('root_menu', address=rcAddr)}}">Back to root</a>
+{% endblock %}

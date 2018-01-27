@@ -232,6 +232,20 @@ def stop():
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
 
+# Retrieves the current error code from Roboclaw. Zero means no
+# error, decoding nonzero value for the user is a future feature.
+
+@app.route('/rc_error')
+def rc_error():
+	try:
+		rc,rcAddr = checkRoboclawAddress()
+
+		errorCode = readResult(rc.ReadError(rcAddr), "Retrieve error code")
+
+		return render_template("rc_error.html", rcAddr=rcAddr, errorCode=errorCode)
+	except ValueError as ve:
+		return redirect(url_for('root_menu'))
+
 # Velocity menu deals with the parameters involved in moving at a target velocity.
 # Usually in terms of quadrature encoder pulses per second.
 
