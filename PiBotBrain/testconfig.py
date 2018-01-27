@@ -216,6 +216,22 @@ def config_menu():
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
 
+# Software option to stop both motors connected to a Roboclaw at the
+# specified address. This is not a substitute for a hardware E-stop, which
+# would be faster and more reliable.
+
+@app.route('/stop')
+def stop():
+	try:
+		rc,rcAddr = checkRoboclawAddress()
+
+		writeResult(rc.ForwardM1(rcAddr, 0), "Stop motor 1")
+		writeResult(rc.ForwardM2(rcAddr, 0), "Stop motor 2")
+
+		return render_template("stop.html", rcAddr=rcAddr)
+	except ValueError as ve:
+		return redirect(url_for('root_menu'))
+
 # Velocity menu deals with the parameters involved in moving at a target velocity.
 # Usually in terms of quadrature encoder pulses per second.
 
