@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h1>Position Settings Menu</h1>
+	<a href="{{url_for('root_menu', address=rcAddr)}}">Back</a>
+	
+	<p>Roboclaw version {{rcVersion}}</p>
+	<hr/>
+	<table>
+		<tr>
+			<th>Encoder</th>
+			<th>Motor 1</th>
+			<th>Motor 2</th>
+		</tr>
+		<tr>
+			<th>Count</th>
+			<td>{{m1enc}}</td>
+			<td>{{m2enc}}</td>
+		</tr>
+		<tr>
+			<th>Status</th>
+			<td>{{"0x%x" | format(m1encStatus)}}</td>
+			<td>{{"0x%x" | format(m2encStatus)}}</td>
+		</tr>
+	</table>
+	<hr/>
+	<form action="{{ url_for('position_menu', address=rcAddr)}}" method="post">
+		<table>
+			<tr>
+				<th>Setting</th>
+				<th>Motor 1</th>
+				<th>Motor 2</th>
+			</tr>
+			<tr>
+				<td>Motor 2</td>
+				<td><input type="radio" name="m2values" value="copym1" checked>Copy M1</td>
+				<td><input type="radio" name="m2values" value="independent">Independent</td>
+			</tr>
+			<tr>
+				<td>Proportional</td>
+				<td><input type="number" size="10" name="m1P", id="m1P", value="{{m1P}}"></td>
+				<td><input type="number" size="10" name="m2P", id="m2P", value="{{m2P}}"></td>
+			</tr>
+			<tr>
+				<td>Integral</td>
+				<td><input type="number" size="10" name="m1I", id="m1I", value="{{m1I}}"></td>
+				<td><input type="number" size="10" name="m2I", id="m2I", value="{{m2I}}"></td>
+			</tr>
+			<tr>
+				<td>Derivative</td>
+				<td><input type="number" size="10" name="m1D", id="m1D", value="{{m1D}}"></td>
+				<td><input type="number" size="10" name="m2D", id="m2D", value="{{m2D}}"></td>
+			</tr>
+			<tr>
+				<td>Max Integral</td>
+				<td><input type="number" size="10" name="m1maxI", id="m1maxI", value="{{m1maxI}}"></td>
+				<td><input type="number" size="10" name="m2maxI", id="m2maxI", value="{{m2maxI}}"></td>
+			</tr>
+			<tr>
+				<td>Deadzone</td>
+				<td><input type="number" size="10" name="m1deadZone", id="m1deadZone", value="{{m1deadZone}}"></td>
+				<td><input type="number" size="10" name="m2deadZone", id="m2deadZone", value="{{m2deadZone}}"></td>
+			</tr>
+			<tr>
+				<td>Min Position</td>
+				<td><input type="number" size="10" name="m1minPos", id="m1minPos", value="{{m1minPos}}"></td>
+				<td><input type="number" size="10" name="m2minPos", id="m2minPos", value="{{m2minPos}}"></td>
+			</tr>
+			<tr>
+				<td>Max Position</td>
+				<td><input type="number" size="10" name="m1maxPos", id="m1maxPos", value="{{m1maxPos}}"></td>
+				<td><input type="number" size="10" name="m2maxPos", id="m2maxPos", value="{{m2maxPos}}"></td>
+			</tr>
+			<tr>
+				<td><input type="submit" value="Update PID"></td>
+			</tr>
+		</table>
+	</form>
+{% endblock %}

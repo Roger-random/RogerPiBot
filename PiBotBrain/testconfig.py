@@ -1,8 +1,12 @@
 # App to configure Roboclaw and test PID values
 
-from flask import Flask, flash, g, redirect, render_template, request, url_for
+from flask import Flask, flash, g, redirect, render_template, request, session, url_for
 import os
 from roboclaw import Roboclaw
+
+defaultAccelDeccel = 2400
+errorPrefix = "ERROR: "
+successPrefix = "SUCCESS: "
 
 app = Flask(__name__)
 
@@ -46,19 +50,19 @@ def checkRoboclawAddress():
 	global rc
 	# Do we have Roboclaw API object?
 	if rc is None:
-		flash("Roboclaw API not initialized")
+		flash(errorPrefix + "Roboclaw API not initialized")
 		raise ValueError
 
 	# Do we have a Roboclaw address?
 	rcAddr = tryParseAddress(request.args.get('address'), default=None)
 	if rcAddr is None:
-		flash("Valid address parameter required")
+		flash(errorPrefix + "Valid address parameter required")
 		raise ValueError
 
 	# Is there a Roboclaw at that address?
 	versionQuery = rc.ReadVersion(rcAddr)
 	if versionQuery[0] == 0:
-		flash("No Roboclaw response at {0} ({0:#x})".format(rcAddr))
+		flash(errorPrefix + "No Roboclaw response at {0} ({0:#x})".format(rcAddr))
 		raise ValueError
 
 	return (rc, rcAddr)
@@ -73,7 +77,7 @@ def checkRoboclawAddress():
 def readResult(resultTuple, flashMessage=None):
 	if resultTuple[0] == 0:
 		if flashMessage is not None:
-			flash("ERROR: {} {}".format(flashMessage, str(resultTuple)))
+			flash(errorPrefix + "{} {}".format(flashMessage, str(resultTuple)))
 		raise ValueError
 
 	if len(resultTuple) == 2:
@@ -87,10 +91,10 @@ def readResult(resultTuple, flashMessage=None):
 def writeResult(result, flashMessage=None):
 	if not result:
 		if flashMessage is not None:
-			flash("ERROR: {}".format(flashMessage))
+			flash(errorPrefix + flashMessage)
 		raise ValueError
 	elif flashMessage is not None:
-		flash("SUCCESS: {}".format(flashMessage))
+		flash(successPrefix + flashMessage)
 
 # Root menu
 @app.route('/')
@@ -135,13 +139,13 @@ def connect_menu():
 		newrc = Roboclaw(portName,baudrate,interCharTimeout,retries)
 		if newrc.Open():
 			rc = newrc
-			flash("Roboclaw API connected to " + portName)
+			flash(successPrefix + "Roboclaw API connected to " + portName)
 			return redirect(url_for('root_menu', address="0x80"))
 		else:
-			flash("Roboclaw API could not open " + portName)
+			flash(errorPrefix + "Roboclaw API could not open " + portName)
 			return redirect(url_for('connect_menu'))
 	else:
-		flash("Unexpected request method on connect")
+		flash(errorPrefix + "Unexpected request method on connect")
 		return redirect(url_for('connect_menu'))
 
 # Config menu pulls down the current values of the general settings we care 
@@ -163,10 +167,10 @@ def config_menu():
 		rcConfig = "{0:#x}".format(readResult(rc.GetConfig(rcAddr), "Read config"))
 
 		if request.method == 'GET':
-			return render_template("config_menu.html", rcVersion=rcVersion, 
+			return render_template("config_menu.html", rcVersion=rcVersion, rcAddr=rcAddr, 
 				VmainMin=VmainMin, VmainMax=VmainMax, AmaxM1=AmaxM1, AmaxM2=AmaxM2, 
 				pwmMode=pwmMode, encModeM1=encModeM1, encModeM2=encModeM2,
-				s3=s3, s4=s4, s5=s5, rcConfig=rcConfig, rcAddr=rcAddr)
+				s3=s3, s4=s4, s5=s5, rcConfig=rcConfig)
 		elif request.method == 'POST':
 			# TODO sanity validation of these values from the HTML form
 			fVmainMin = int(request.form['VmainMin'])
@@ -207,7 +211,91 @@ def config_menu():
 
 			return redirect(url_for('config_menu',address=rcAddr))
 		else:
-			flash("Unexpected request method on config")
-			return redirect(url_for('config_menu'))
+			flash(errorPrefix + "Unexpected request.method on config")
+			return redirect(url_for('config_menu',address=rcAddr))
+	except ValueError as ve:
+		return redirect(url_for('root_menu'))
+
+
+@app.route('/position', methods=['GET','POST'])
+def position_menu():
+	try:
+		rc,rcAddr = checkRoboclawAddress()
+
+		rcVersion = readResult(rc.ReadVersion(rcAddr), "Read version string")
+		m1P, m1I, m1D, m1maxI, m1deadZone, m1minPos, m1maxPos = readResult(rc.ReadM1PositionPID(rcAddr), "Read M1 position PID")
+		m2P, m2I, m2D, m2maxI, m2deadZone, m2minPos, m2maxPos = readResult(rc.ReadM2PositionPID(rcAddr), "Read M2 position PID")
+
+		# Roboclaw API returns P/I/D as floating point even though it only accepts integers.
+		# To remain consistent even when the API is not, turn them to integers.
+		m1P = int(m1P)
+		m2P = int(m2P)
+		m1I = int(m1I)
+		m2I = int(m2I)
+		m1D = int(m1D)
+		m2D = int(m2D)
+
+		m1enc, m1encStatus = readResult(rc.ReadEncM1(rcAddr), "Read M1 Encoder")
+		m2enc, m2encStatus = readResult(rc.ReadEncM2(rcAddr), "Read M2 encoder")
+		m1accel = session.get('m1accel', defaultAccelDeccel)
+		m2accel = session.get('m2accel', defaultAccelDeccel)
+		m1deccel = session.get('m1deccel', defaultAccelDeccel)
+		m2deccel = session.get('m2deccel', defaultAccelDeccel)
+		m1posA = session.get('m1posA', 0)
+		m1posB = session.get('m1posB', 0)
+		m2posA = session.get('m2posA', 0)
+		m2posB = session.get('m2posB', 0)
+
+		if request.method == 'GET':
+			return render_template("position_menu.html", rcVersion=rcVersion, rcAddr=rcAddr,
+				m1P=m1P, m1I=m1I, m1D=m1D, m1maxI=m1maxI, 
+				m1deadZone=m1deadZone, m1minPos=m1minPos, m1maxPos=m1maxPos,
+				m2P=m2P, m2I=m2I, m2D=m2D, m2maxI=m2maxI, 
+				m2deadZone=m2deadZone, m2minPos=m2minPos, m2maxPos=m2maxPos,
+				m1enc=m1enc, m1encStatus=m1encStatus,
+				m2enc=m2enc, m2encStatus=m2encStatus,
+				m1accel=m1accel, m1deccel=m1deccel,
+				m2accel=m2accel, m2deccel=m2deccel,
+				m1posA=m1posA, m1posB=m1posB,
+				m2posA=m2posA, m2posB=m2posB)
+		elif request.method == 'POST':
+			# TODO sanity validation of these values from the HTML form
+			fm1P = int(request.form['m1P'])
+			fm1I = int(request.form['m1I'])
+			fm1D = int(request.form['m1D'])
+			fm1maxI = int(request.form['m1maxI'])
+			fm1deadZone = int(request.form['m1deadZone'])
+			fm1minPos = int(request.form['m1minPos'])
+			fm1maxPos = int(request.form['m1maxPos'])
+
+			if request.form['m2values']=="copym1":
+				fm2P = fm1P
+				fm2I = fm1I
+				fm2D = fm1D
+				fm2maxI = fm1maxI
+				fm2deadZone = fm1deadZone
+				fm2minPos = fm1minPos
+				fm2maxPos = fm1maxPos
+			else:
+				fm2P = int(request.form['m2P'])
+				fm2I = int(request.form['m2I'])
+				fm2D = int(request.form['m2D'])
+				fm2maxI = int(request.form['m2maxI'])
+				fm2deadZone = int(request.form['m2deadZone'])
+				fm2minPos = int(request.form['m2minPos'])
+				fm2maxPos = int(request.form['m2maxPos'])
+
+			if fm1P != m1P or fm1I != m1I or fm1D != m1D or fm1maxI != m1maxI or fm1deadZone != m1deadZone or fm1minPos != m1minPos or fm1maxPos != m1maxPos:
+			   writeResult(rc.SetM1PositionPID(rcAddr, fm1P, fm1I, fm1D, fm1maxI, 
+			   	fm1deadZone, fm1minPos, fm1maxPos), "Update M1 Position PID")
+
+			if fm2P != m2P or fm2I != m2I or fm2D != m2D or fm2maxI != m2maxI or fm2deadZone != m2deadZone or fm2minPos != m2minPos or fm2maxPos != m2maxPos:
+			   writeResult(rc.SetM2PositionPID(rcAddr, fm2P, fm2I, fm2D, fm2maxI, 
+			   	fm2deadZone, fm2minPos, fm2maxPos), "Update M2 Position PID")
+
+			return redirect(url_for('position_menu',address=rcAddr))
+		else:
+			flash(errorPrefix + "Unexpected request.method on position")
+			return redirect(url_for('position_menu',address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))

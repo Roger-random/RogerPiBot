@@ -5,7 +5,7 @@
 		{% if display %}
 			<a href="{{url_for('config_menu', address=address)}}">Configuration</a>
 			<a href="#">Velocity</a>
-			<a href="#">Position</a>
+			<a href="{{url_for('position_menu', address=address)}}">Position</a>
 		{% endif %}
 		<hr/>
 	{% endif %}
