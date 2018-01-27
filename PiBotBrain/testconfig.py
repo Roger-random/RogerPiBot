@@ -186,47 +186,47 @@ def config_menu():
 			fs5 = int(request.form['s5'])
 			frcConfig = int(request.form['rcConfig'],16)
 
-			configUpdated = False
-
 			if fVmainMin != VmainMin or fVmainMax != VmainMax:
 				writeResult(rc.SetMainVoltages(rcAddr, fVmainMin, fVmainMax), "Update Main voltage limits")
-				configUpdated = True
 
 			if fAmaxM1 != AmaxM1:
 				writeResult(rc.SetM1MaxCurrent(rcAddr, fAmaxM1), "Update M1 max current")
-				configUpdated = True
 
 			if fAmaxM2 != AmaxM2:
 				writeResult(rc.SetM2MaxCurrent(rcAddr, fAmaxM2), "Update M2 max current")
-				configUpdated = True
 
 			if fpwmMode != pwmMode:
 				writeResult(rc.SetPWMMode(rcAddr, fpwmMode), "Update PWM mode")
-				configUpdated = True
 
 			if fencModeM1 != encModeM1:
 				writeResult(rc.SetM1EncoderMode(rcAddr, fencModeM1), "Update M1 encoder mode")
-				configUpdated = True
 
 			if fencModeM2 != encModeM2:
 				writeResult(rc.SetM2EncoderMode(rcAddr, fencModeM2), "Update M2 encoder mode")
-				configUpdated = True
 
 			if fs3 != s3 or fs4 != s4 or fs5 != s5:
 				writeResult(rc.SetPinFunctions(rcAddr, fs3, fs4, fs5), "Update S3/S4/S5 functions")
-				configUpdated = True
 
 			if frcConfig != int(rcConfig,16):
 				writeResult(rc.SetConfig(rcAddr, frcConfig), "Update config flags")
-				configUpdated = True
-
-			if configUpdated:
-				writeResult(rc.WriteNVM(rcAddr), "Write to non-volatile memory")
 
 			return redirect(url_for('config_menu',address=rcAddr))
 		else:
 			flash(errorPrefix + "Unexpected request.method on config")
 			return redirect(url_for('config_menu',address=rcAddr))
+	except ValueError as ve:
+		return redirect(url_for('root_menu'))
+
+# Write the current settings to non-volatile memory
+
+@app.route('/writenvm')
+def writenvm():
+	try:
+		rc, rcAddr = checkRoboclawAddress()
+
+		writeResult(rc.WriteNVM(rcAddr), "Write to non-volatile memory")
+
+		return redirect(url_for('root_menu', address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
 
