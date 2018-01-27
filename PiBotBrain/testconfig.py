@@ -270,8 +270,10 @@ def velocity_menu():
 	try:
 		rc,rcAddr = checkRoboclawAddress()
 
-		m1P, m1I, m1D, m1qpps = readResult(ReadM1VelocityPID(rcAddr))
-		m2P, m2I, m2D, m2qpps = readResult(ReadM2VelocityPID(rcAddr))
+		rcVersion = readResult(rc.ReadVersion(rcAddr), "Read version string")
+
+		m1P, m1I, m1D, m1qpps = readResult(rc.ReadM1VelocityPID(rcAddr), "Read M1 velocity PID")
+		m2P, m2I, m2D, m2qpps = readResult(rc.ReadM2VelocityPID(rcAddr), "Read M2 velocity PID")
 
 		# Roboclaw API returns P/I/D as floating point even though it only accepts integers.
 		# To remain consistent even when the API is not, turn them to integers.
@@ -285,8 +287,16 @@ def velocity_menu():
 		m1enc, m1encStatus = readResult(rc.ReadEncM1(rcAddr), "Read M1 Encoder")
 		m2enc, m2encStatus = readResult(rc.ReadEncM2(rcAddr), "Read M2 encoder")
 
+		m1speed = session.get('m1speed', 0)
+		m2speed = session.get('m2speed', 0)
+
 		if request.method == 'GET':
-			return("Velocity menu  not yet implemented, placeholder only.")
+			return render_template("velocity_menu.html", rcVersion=rcVersion, rcAddr=rcAddr,
+				m1P=m1P, m1I=m1I, m1D=m1D, m1qpps=m1qpps,
+				m2P=m2P, m2I=m2I, m2D=m2D, m2qpps=m2qpps,
+				m1enc=m1enc, m1encStatus=m1encStatus,
+				m2enc=m2enc, m2encStatus=m2encStatus,
+				m1speed=m1speed, m2speed=m2speed)
 		elif request.method == 'POST':
 			flash(errorPrefix + "Velocity POST not yet implemented, placeholder only.")
 			return redirect(url_for('velocity_menu',address=rcAddr))
@@ -296,6 +306,15 @@ def velocity_menu():
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
 
+@app.route('/run_velocity', methods=['POST'])
+def run_velocity():
+	try:
+		rc,rcAddr = checkRoboclawAddress()
+
+		flash(errorPrefix + "Run @ velocity not yet implemented.")
+		return redirect(url_for('velocity_menu',address=rcAddr))
+	except ValueError as ve:
+		return redirect(url_for('root_menu'))
 
 # Position menu deals with the parameters involved in moving to a target position.
 # With min/max values, it implies positional application like a RC servo motor.

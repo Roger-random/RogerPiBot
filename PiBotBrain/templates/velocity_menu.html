@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h1>Velocity menu</h1>
+	<a href="{{url_for('root_menu', address=rcAddr)}}">Back</a>
+	
+	<p>Roboclaw version {{rcVersion}}</p>
+	<a href="{{url_for('stop', address=rcAddr)}}">STOP MOTORS</a>
+
+	<hr/>
+
+	<table>
+		<tr>
+			<th>Encoder</th>
+			<th>Motor 1</th>
+			<th>Motor 2</th>
+		</tr>
+		<tr>
+			<th>Count</th>
+			<td>{{m1enc}}</td>
+			<td>{{m2enc}}</td>
+		</tr>
+		<tr>
+			<th>Status</th>
+			<td>{{"0x%x" | format(m1encStatus)}}</td>
+			<td>{{"0x%x" | format(m2encStatus)}}</td>
+		</tr>
+	</table>
+	<hr/>
+	<form action="{{ url_for('run_velocity', address=rcAddr)}}" method="post">
+		<table>
+			<tr>
+				<th>Value</th>
+				<th>Motor 1</th>
+				<th>Motor 2</th>
+			</tr>
+			<tr>
+				<th>Speed</th>
+				<td><input type="number" size="10" name="m1speed" id="m1speed" value="{{m1speed}}"></td>
+				<td><input type="number" size="10" name="m2speed" id="m2speed" value="{{m2speed}}"></td>
+			</tr>
+			<tr>
+				<td><input type="submit" value="Run at Velocity"></td>
+			</tr>
+		</table>
+	</form>
+	<hr/>
+	<form action="{{ url_for('velocity_menu', address=rcAddr)}}" method="post">
+		<table>
+			<tr>
+				<th>Setting</th>
+				<th>Motor 1</th>
+				<th>Motor 2</th>
+			</tr>
+			<tr>
+				<td>Motor 2</td>
+				<td><input type="radio" name="m2values" value="copym1" checked>Copy M1</td>
+				<td><input type="radio" name="m2values" value="independent">Independent</td>
+			</tr>
+			<tr>
+				<td>Proportional</td>
+				<td><input type="number" size="10" name="m1P" id="m1P" value="{{m1P}}"></td>
+				<td><input type="number" size="10" name="m2P" id="m2P" value="{{m2P}}"></td>
+			</tr>
+			<tr>
+				<td>Integral</td>
+				<td><input type="number" size="10" name="m1I" id="m1I" value="{{m1I}}"></td>
+				<td><input type="number" size="10" name="m2I" id="m2I" value="{{m2I}}"></td>
+			</tr>
+			<tr>
+				<td>Derivative</td>
+				<td><input type="number" size="10" name="m1D" id="m1D" value="{{m1D}}"></td>
+				<td><input type="number" size="10" name="m2D" id="m2D" value="{{m2D}}"></td>
+			</tr>
+			<tr>
+				<td>Quadrature Pulses Per Second</td>
+				<td><input type="number" size="10" name="m1qpps" id="m1qpps" value="{{m1qpps}}"></td>
+				<td><input type="number" size="10" name="m2qpps" id="m2qpps" value="{{m2qpps}}"></td>
+			</tr>
+			<tr>
+				<td><input type="submit" value="Update Velocity PID"></td>
+			</tr>
+		</table>
+	</form>
+
+{% endblock %}
