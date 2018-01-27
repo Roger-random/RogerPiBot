@@ -4,7 +4,8 @@ from flask import Flask, flash, g, redirect, render_template, request, session, 
 import os
 from roboclaw import Roboclaw
 
-defaultAccelDeccel = 2400
+defaultAccelDecel = 2400
+defaultSpeed = 240
 errorPrefix = "ERROR: "
 successPrefix = "SUCCESS: "
 
@@ -289,10 +290,12 @@ def position_menu():
 
 		m1enc, m1encStatus = readResult(rc.ReadEncM1(rcAddr), "Read M1 Encoder")
 		m2enc, m2encStatus = readResult(rc.ReadEncM2(rcAddr), "Read M2 encoder")
-		m1accel = session.get('m1accel', defaultAccelDeccel)
-		m2accel = session.get('m2accel', defaultAccelDeccel)
-		m1deccel = session.get('m1deccel', defaultAccelDeccel)
-		m2deccel = session.get('m2deccel', defaultAccelDeccel)
+		m1accel = session.get('m1accel', defaultAccelDecel)
+		m2accel = session.get('m2accel', defaultAccelDecel)
+		m1speed = session.get('m1speed', defaultSpeed)
+		m2speed = session.get('m2speed', defaultSpeed)
+		m1decel = session.get('m1decel', defaultAccelDecel)
+		m2decel = session.get('m2decel', defaultAccelDecel)
 		m1posA = session.get('m1posA', 0)
 		m1posB = session.get('m1posB', 0)
 		m2posA = session.get('m2posA', 0)
@@ -306,8 +309,8 @@ def position_menu():
 				m2deadZone=m2deadZone, m2minPos=m2minPos, m2maxPos=m2maxPos,
 				m1enc=m1enc, m1encStatus=m1encStatus,
 				m2enc=m2enc, m2encStatus=m2encStatus,
-				m1accel=m1accel, m1deccel=m1deccel,
-				m2accel=m2accel, m2deccel=m2deccel,
+				m1accel=m1accel, m1decel=m1decel, m1speed=m1speed,
+				m2accel=m2accel, m2decel=m2decel, m2speed=m2speed,
 				m1posA=m1posA, m1posB=m1posB,
 				m2posA=m2posA, m2posB=m2posB)
 		elif request.method == 'POST':
@@ -349,5 +352,42 @@ def position_menu():
 		else:
 			flash(errorPrefix + "Unexpected request.method on position")
 			return redirect(url_for('position_menu',address=rcAddr))
+	except ValueError as ve:
+		return redirect(url_for('root_menu'))
+
+# Tell Roboclaw to move with the given acceleration, deceleration, and position.
+@app.route('/to_position', methods=['POST'])
+def to_position():
+	try:
+		rc,rcAddr = checkRoboclawAddress()
+
+		# Pull values from form, update them in session dictionary.
+		session['m1accel'] = m1accel = int(request.form['m1accel'])		
+		session['m2accel'] = m2accel = int(request.form['m2accel'])
+		session['m1speed'] = m1speed = int(request.form['m1speed'])
+		session['m2speed'] = m2speed = int(request.form['m2speed'])
+		session['m1decel'] = m1decel = int(request.form['m1decel'])
+		session['m2decel'] = m2decel = int(request.form['m2decel'])
+
+		target = request.form['target']
+
+		if target == 'a':
+			session['m1posA'] = m1pos = int(request.form['m1posA'])
+			session['m2posA'] = m2pos = int(request.form['m2posA'])
+		elif target == 'b':
+			session['m1posB'] = m1pos = int(request.form['m1posB'])
+			session['m2posB'] = m2pos = int(request.form['m2posB'])
+		else:
+			flash(errorPrefix + "Invalid target")
+			raise ValueError
+
+		writeResult(rc.SpeedAccelDeccelPositionM1M2(rcAddr, 
+			m1accel, m1speed, m1decel, m1pos, 
+			m2accel, m2speed, m2decel, m2pos, 1),
+			"Moving to position (M1 {0} {1} {2} {3}) (M2 {4} {5} {6} {7})".format(
+				m1accel, m1speed, m1decel, m1pos, 
+				m2accel, m2speed, m2decel, m2pos))
+
+		return redirect(url_for('position_menu',address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))

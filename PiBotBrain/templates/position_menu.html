@@ -5,7 +5,6 @@
 	
 	<p>Roboclaw version {{rcVersion}}</p>
 	<a href="{{url_for('stop', address=rcAddr)}}">STOP MOTORS</a>
-	<hr/>
 
 	<hr/>
 	<table>
@@ -26,6 +25,48 @@
 		</tr>
 	</table>
 	<hr/>
+	<form action="{{ url_for('to_position', address=rcAddr)}}" method="post">
+		<table>
+			<tr>
+				<th>Value</th>
+				<th>Motor 1</th>
+				<th>Motor 2</th>
+				<th>Goto</th>
+			</tr>
+			<tr>
+				<th>Acceleration</th>
+				<td><input type="number" size="10" name="m1accel" id="m1accel" value="{{m1accel}}"></td>
+				<td><input type="number" size="10" name="m2accel" id="m2accel" value="{{m2accel}}"></td>
+			</tr>
+			<tr>
+				<th>Speed</th>
+				<td><input type="number" size="10" name="m1speed" id="m1speed" value="{{m1speed}}"></td>
+				<td><input type="number" size="10" name="m2speed" id="m2speed" value="{{m2speed}}"></td>
+			</tr>
+			<tr>
+				<th>Deceleration</th>
+				<td><input type="number" size="10" name="m1decel" id="m1decel" value="{{m1decel}}"></td>
+				<td><input type="number" size="10" name="m2decel" id="m2decel" value="{{m2decel}}"></td>
+			</tr>
+			<tr>
+				<th>Target A</th>
+				<td><input type="number" size="10" name="m1posA" id="m1posA" value="{{m1posA}}"></td>
+				<td><input type="number" size="10" name="m2posA" id="m2posA" value="{{m2posA}}"></td>
+				<td><input type="radio" name="target", value="a" checked>A</td>
+			</tr>
+			<tr>
+				<th>Target B</th>
+				<td><input type="number" size="10" name="m1posB" id="m1posB" value="{{m1posB}}"></td>
+				<td><input type="number" size="10" name="m2posB" id="m2posB" value="{{m2posB}}"></td>
+				<td><input type="radio" name="target", value="b"        >B</td>
+			</tr>
+			<tr>
+				<td colspan="3"></td>
+				<td><input type="submit" value="Go!"></td>
+			</tr>
+		</table>
+	</form>
+	<hr/>
 	<form action="{{ url_for('position_menu', address=rcAddr)}}" method="post">
 		<table>
 			<tr>
@@ -40,38 +81,38 @@
 			</tr>
 			<tr>
 				<td>Proportional</td>
-				<td><input type="number" size="10" name="m1P", id="m1P", value="{{m1P}}"></td>
-				<td><input type="number" size="10" name="m2P", id="m2P", value="{{m2P}}"></td>
+				<td><input type="number" size="10" name="m1P" id="m1P" value="{{m1P}}"></td>
+				<td><input type="number" size="10" name="m2P" id="m2P" value="{{m2P}}"></td>
 			</tr>
 			<tr>
 				<td>Integral</td>
-				<td><input type="number" size="10" name="m1I", id="m1I", value="{{m1I}}"></td>
-				<td><input type="number" size="10" name="m2I", id="m2I", value="{{m2I}}"></td>
+				<td><input type="number" size="10" name="m1I" id="m1I" value="{{m1I}}"></td>
+				<td><input type="number" size="10" name="m2I" id="m2I" value="{{m2I}}"></td>
 			</tr>
 			<tr>
 				<td>Derivative</td>
-				<td><input type="number" size="10" name="m1D", id="m1D", value="{{m1D}}"></td>
-				<td><input type="number" size="10" name="m2D", id="m2D", value="{{m2D}}"></td>
+				<td><input type="number" size="10" name="m1D" id="m1D" value="{{m1D}}"></td>
+				<td><input type="number" size="10" name="m2D" id="m2D" value="{{m2D}}"></td>
 			</tr>
 			<tr>
 				<td>Max Integral</td>
-				<td><input type="number" size="10" name="m1maxI", id="m1maxI", value="{{m1maxI}}"></td>
-				<td><input type="number" size="10" name="m2maxI", id="m2maxI", value="{{m2maxI}}"></td>
+				<td><input type="number" size="10" name="m1maxI" id="m1maxI" value="{{m1maxI}}"></td>
+				<td><input type="number" size="10" name="m2maxI" id="m2maxI" value="{{m2maxI}}"></td>
 			</tr>
 			<tr>
 				<td>Deadzone</td>
-				<td><input type="number" size="10" name="m1deadZone", id="m1deadZone", value="{{m1deadZone}}"></td>
-				<td><input type="number" size="10" name="m2deadZone", id="m2deadZone", value="{{m2deadZone}}"></td>
+				<td><input type="number" size="10" name="m1deadZone" id="m1deadZone" value="{{m1deadZone}}"></td>
+				<td><input type="number" size="10" name="m2deadZone" id="m2deadZone" value="{{m2deadZone}}"></td>
 			</tr>
 			<tr>
 				<td>Min Position</td>
-				<td><input type="number" size="10" name="m1minPos", id="m1minPos", value="{{m1minPos}}"></td>
-				<td><input type="number" size="10" name="m2minPos", id="m2minPos", value="{{m2minPos}}"></td>
+				<td><input type="number" size="10" name="m1minPos" id="m1minPos" value="{{m1minPos}}"></td>
+				<td><input type="number" size="10" name="m2minPos" id="m2minPos" value="{{m2minPos}}"></td>
 			</tr>
 			<tr>
 				<td>Max Position</td>
-				<td><input type="number" size="10" name="m1maxPos", id="m1maxPos", value="{{m1maxPos}}"></td>
-				<td><input type="number" size="10" name="m2maxPos", id="m2maxPos", value="{{m2maxPos}}"></td>
+				<td><input type="number" size="10" name="m1maxPos" id="m1maxPos" value="{{m1maxPos}}"></td>
+				<td><input type="number" size="10" name="m2maxPos" id="m2maxPos" value="{{m2maxPos}}"></td>
 			</tr>
 			<tr>
 				<td><input type="submit" value="Update PID"></td>
