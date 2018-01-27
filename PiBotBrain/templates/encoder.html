@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h1>Set encoder count</h1>
+	<a href="{{url_for('root_menu', address=rcAddr)}}">Back</a>
+	<hr/>
+	<form action="{{ url_for('encoder', address=rcAddr)}}" method="post">
+	<table>
+		<tr>
+			<th>Encoder</th>
+			<th>Motor 1</th>
+			<th>Motor 2</th>
+		</tr>
+		<tr>
+			<th>Count</th>
+			<td><input type="number" size="10" name="m1enc" id="m1enc" value="{{m1enc}}"></td>
+			<td><input type="number" size="10" name="m2enc" id="m2enc" value="{{m2enc}}"></td>
+		</tr>
+		<tr>
+			<th>Status</th>
+			<td>{{"0x%x" | format(m1encStatus)}}</td>
+			<td>{{"0x%x" | format(m2encStatus)}}</td>
+		</tr>
+		<tr>
+			<td><input type="submit" value="Set"/></td>
+		</tr>
+	</table>
+{% endblock %}

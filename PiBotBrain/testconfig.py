@@ -260,6 +260,39 @@ def rc_error():
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
 
+# Allows user to set quadrature encoder count to specified values
+
+@app.route('/encoder', methods=['GET', 'POST'])
+def encoder():
+	try:
+		rc,rcAddr = checkRoboclawAddress()
+
+		m1enc, m1encStatus = readResult(rc.ReadEncM1(rcAddr), "Read M1 encoder")
+		m2enc, m2encStatus = readResult(rc.ReadEncM2(rcAddr), "Read M2 encoder")
+
+		if request.method == 'GET':
+			return render_template("encoder.html", rcAddr=rcAddr,
+				m1enc=m1enc, m1encStatus=m1encStatus,
+				m2enc=m2enc, m2encStatus=m2encStatus )
+		elif request.method == 'POST':
+			# TODO sanity validation of these values from the HTML form
+			fm1enc = int(request.form['m1enc'])
+			fm2enc = int(request.form['m2enc'])
+
+			if fm1enc != m1enc:
+				writeResult(rc.SetEncM1(rcAddr, fm1enc), "Set M1 quadrature encoder count")
+
+			if fm2enc != m2enc:
+				writeResult(rc.SetEncM2(rcAddr, fm2enc), "Set M2 quadrature encoder count")
+
+			return redirect(url_for('root_menu', address=rcAddr))
+		else:
+			flash(errorPrefix + "Unexpected request.method on encoder")
+			return redirect(url_for('encoder',address=rcAddr))
+
+	except ValueError as ve:
+		return redirect(url_for('root_menu'))
+
 # Velocity menu deals with the parameters involved in moving at a target velocity.
 # Usually in terms of quadrature encoder pulses per second.
 
@@ -282,7 +315,7 @@ def velocity_menu():
 		m1D = int(m1D)
 		m2D = int(m2D)
 
-		m1enc, m1encStatus = readResult(rc.ReadEncM1(rcAddr), "Read M1 Encoder")
+		m1enc, m1encStatus = readResult(rc.ReadEncM1(rcAddr), "Read M1 encoder")
 		m2enc, m2encStatus = readResult(rc.ReadEncM2(rcAddr), "Read M2 encoder")
 
 		m1speed = session.get('m1speed', 0)
@@ -361,7 +394,7 @@ def position_menu():
 		m1D = int(m1D)
 		m2D = int(m2D)
 
-		m1enc, m1encStatus = readResult(rc.ReadEncM1(rcAddr), "Read M1 Encoder")
+		m1enc, m1encStatus = readResult(rc.ReadEncM1(rcAddr), "Read M1 encoder")
 		m2enc, m2encStatus = readResult(rc.ReadEncM2(rcAddr), "Read M2 encoder")
 		m1accel = session.get('m1accel', defaultAccelDecel)
 		m2accel = session.get('m2accel', defaultAccelDecel)
