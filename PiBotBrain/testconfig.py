@@ -216,6 +216,28 @@ def config_menu():
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
 
+# Velocity menu deals with the parameters involved in moving at a target velocity.
+# Usually in terms of quadrature encoder pulses per second.
+
+@app.route('/velocity', methods=['GET','POST'])
+def velocity_menu():
+	try:
+		rc,rcAddr = checkRoboclawAddress()
+
+		if request.method == 'GET':
+			return("Velocity menu  not yet implemented, placeholder only.")
+		elif request.method == 'POST':
+			flash(errorPrefix + "Velocity POST not yet implemented, placeholder only.")
+			return redirect(url_for('velocity_menu',address=rcAddr))
+		else:
+			flash(errorPrefix + "Unexpected request.method on velocity")
+			return redirect(url_for('velocity_menu',address=rcAddr))
+	except ValueError as ve:
+		return redirect(url_for('root_menu'))
+
+
+# Position menu deals with the parameters involved in moving to a target position.
+# With min/max values, it implies positional application like a RC servo motor.
 
 @app.route('/position', methods=['GET','POST'])
 def position_menu():
