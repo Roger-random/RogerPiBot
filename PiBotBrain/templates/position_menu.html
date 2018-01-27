@@ -31,7 +31,6 @@
 				<th>Value</th>
 				<th>Motor 1</th>
 				<th>Motor 2</th>
-				<th>Goto</th>
 			</tr>
 			<tr>
 				<th>Acceleration</th>
@@ -49,23 +48,42 @@
 				<td><input type="number" size="10" name="m2decel" id="m2decel" value="{{m2decel}}"></td>
 			</tr>
 			<tr>
-				<th>Target A</th>
-				<td><input type="number" size="10" name="m1posA" id="m1posA" value="{{m1posA}}"></td>
-				<td><input type="number" size="10" name="m2posA" id="m2posA" value="{{m2posA}}"></td>
-				<td><input type="radio" name="target", value="a" checked>A</td>
+				<th>Target</th>
+				<td><input type="number" size="10" name="m1pos" id="m1pos" value="{{m1pos}}"></td>
+				<td><input type="number" size="10" name="m2pos" id="m2pos" value="{{m2pos}}"></td>
 			</tr>
 			<tr>
-				<th>Target B</th>
-				<td><input type="number" size="10" name="m1posB" id="m1posB" value="{{m1posB}}"></td>
-				<td><input type="number" size="10" name="m2posB" id="m2posB" value="{{m2posB}}"></td>
-				<td><input type="radio" name="target", value="b"        >B</td>
-			</tr>
-			<tr>
-				<td colspan="3"></td>
 				<td><input type="submit" value="Go!"></td>
 			</tr>
 		</table>
 	</form>
+	<hr/>
+		<p><b>Target Delta</b></p>
+		<input type="number" size="10" name="targetDelta" id="targetDelta" value="{{targetDelta}}"><br/>
+		<button onclick="
+			delta=document.getElementById('targetDelta');
+			m1pos=document.getElementById('m1pos');
+			m2pos=document.getElementById('m2pos');
+			m1pos.value = parseInt(m1pos.value)+parseInt(delta.value);
+			m2pos.value = parseInt(m2pos.value)+parseInt(delta.value);">+1 +2</button>
+		<button onclick="
+			delta=document.getElementById('targetDelta');
+			m1pos=document.getElementById('m1pos');
+			m2pos=document.getElementById('m2pos');
+			m1pos.value = parseInt(m1pos.value)+parseInt(delta.value);
+			m2pos.value = parseInt(m2pos.value)-parseInt(delta.value);">+1 -2</button>
+		<button onclick="
+			delta=document.getElementById('targetDelta');
+			m1pos=document.getElementById('m1pos');
+			m2pos=document.getElementById('m2pos');
+			m1pos.value = parseInt(m1pos.value)-parseInt(delta.value);
+			m2pos.value = parseInt(m2pos.value)+parseInt(delta.value);">-1 +2</button>
+		<button onclick="
+			delta=document.getElementById('targetDelta');
+			m1pos=document.getElementById('m1pos');
+			m2pos=document.getElementById('m2pos');
+			m1pos.value = parseInt(m1pos.value)-parseInt(delta.value);
+			m2pos.value = parseInt(m2pos.value)-parseInt(delta.value);">-1 -2</button>
 	<hr/>
 	<form action="{{ url_for('position_menu', address=rcAddr)}}" method="post">
 		<table>

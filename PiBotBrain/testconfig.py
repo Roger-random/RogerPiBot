@@ -402,10 +402,8 @@ def position_menu():
 		m2speed = session.get('m2speed', defaultSpeed)
 		m1decel = session.get('m1decel', defaultAccelDecel)
 		m2decel = session.get('m2decel', defaultAccelDecel)
-		m1posA = session.get('m1posA', 0)
-		m1posB = session.get('m1posB', 0)
-		m2posA = session.get('m2posA', 0)
-		m2posB = session.get('m2posB', 0)
+		m1pos = session.get('m1pos', 0)
+		m2pos = session.get('m2pos', 0)
 
 		if request.method == 'GET':
 			return render_template("position_menu.html", rcVersion=rcVersion, rcAddr=rcAddr,
@@ -417,8 +415,7 @@ def position_menu():
 				m2enc=m2enc, m2encStatus=m2encStatus,
 				m1accel=m1accel, m1decel=m1decel, m1speed=m1speed,
 				m2accel=m2accel, m2decel=m2decel, m2speed=m2speed,
-				m1posA=m1posA, m1posB=m1posB,
-				m2posA=m2posA, m2posB=m2posB)
+				m1pos=m1pos, m2pos=m2pos)
 		elif request.method == 'POST':
 			# TODO sanity validation of these values from the HTML form
 			fm1P = int(request.form['m1P'])
@@ -476,17 +473,8 @@ def to_position():
 		session['m1decel'] = m1decel = int(request.form['m1decel'])
 		session['m2decel'] = m2decel = int(request.form['m2decel'])
 
-		target = request.form['target']
-
-		if target == 'a':
-			session['m1posA'] = m1pos = int(request.form['m1posA'])
-			session['m2posA'] = m2pos = int(request.form['m2posA'])
-		elif target == 'b':
-			session['m1posB'] = m1pos = int(request.form['m1posB'])
-			session['m2posB'] = m2pos = int(request.form['m2posB'])
-		else:
-			flash(errorPrefix + "Invalid target")
-			raise ValueError
+		session['m1pos'] = m1pos = int(request.form['m1pos'])
+		session['m2pos'] = m2pos = int(request.form['m2pos'])
 
 		writeResult(rc.SpeedAccelDeccelPositionM1M2(rcAddr, 
 			m1accel, m1speed, m1decel, m1pos, 
