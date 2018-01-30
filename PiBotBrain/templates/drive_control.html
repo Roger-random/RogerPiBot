@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h1>Velocity menu</h1>
+	<a href="{{url_for('root_menu', address=rcAddr)}}">Back</a>
+	<hr/>	
+	<a href="{{url_for('stop', address=rcAddr)}}">STOP MOTORS</a>
+	<hr/>
+	{{placeholder}}
+{% endblock %}

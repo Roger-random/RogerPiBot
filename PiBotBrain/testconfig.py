@@ -486,3 +486,22 @@ def to_position():
 		return redirect(url_for('position_menu',address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
+
+# "Drive" presents a more user-friendly way to drive the robot around,
+# not the big table of numerical inputs of the config/velocity/position menus.
+
+@app.route('/drive_control', methods=['GET','POST'])
+def drive_control():
+	try:
+		rc,rcAddr = checkRoboclawAddress()
+		if request.method == 'GET':
+			return render_template("drive_control.html", rcAddr=rcAddr,
+				placeholder="Placeholder")
+		elif request.method == 'POST':
+			flash(errorPrefix + "Drive_control POST placeholder only")
+			return redirect(url_for('drive_control',address=rcAddr))
+		else:
+			flash(errorPrefix + "Unexpected request.method on drive_control")
+			return redirect(url_for('drive_control',address=rcAddr))
+	except ValueError as ve:
+		return redirect(url_for('root_menu'))
