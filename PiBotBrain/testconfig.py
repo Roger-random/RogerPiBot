@@ -494,11 +494,46 @@ def to_position():
 def drive_control():
 	try:
 		rc,rcAddr = checkRoboclawAddress()
+
+		speed = session.get('speed', 300)
+		eppr = session.get('eppr', 6200)
+
 		if request.method == 'GET':
 			return render_template("drive_control.html", rcAddr=rcAddr,
-				placeholder="Placeholder")
+				speed=speed, eppr=eppr)
 		elif request.method == 'POST':
-			flash(errorPrefix + "Drive_control POST placeholder only")
+			encoderSet = 250000
+			m1delta = m2delta = 0
+			session['speed'] = speed = int(request.form['speed'])
+			if request.form['movement'] == "linear":
+				distance = int(request.form['distanceNumber'])
+				m1delta = m2delta = distance * 2400
+			elif request.form['movement'] == "rotation":
+				session['eppr'] = eppr = int(request.form['rotationPulses'])
+				rotation = int(request.form['rotationNumber'])
+				m1delta = int(rotation * eppr / 360)
+				m2delta = -m1delta
+			else:
+				flash(errorPrefix + "Unknown movement type")
+
+			m1accel = session.get('m1accel', defaultAccelDecel)
+			m2accel = session.get('m2accel', defaultAccelDecel)
+			m1decel = session.get('m1decel', defaultAccelDecel)
+			m2decel = session.get('m2decel', defaultAccelDecel)
+
+			writeResult(rc.SetEncM1(rcAddr, encoderSet), "Set M1 quadrature encoder count")
+			writeResult(rc.SetEncM2(rcAddr, encoderSet), "Set M2 quadrature encoder count")
+
+			m1pos = encoderSet + m1delta
+			m2pos = encoderSet + m2delta
+
+			writeResult(rc.SpeedAccelDeccelPositionM1M2(rcAddr, 
+				m1accel, speed, m1decel, m1pos, 
+				m2accel, speed, m2decel, m2pos, 1),
+				"Moving to position (M1 {0} {1} {2} {3}) (M2 {4} {5} {6} {7})".format(
+					m1accel, speed, m1decel, m1pos, 
+					m2accel, speed, m2decel, m2pos))
+
 			return redirect(url_for('drive_control',address=rcAddr))
 		else:
 			flash(errorPrefix + "Unexpected request.method on drive_control")

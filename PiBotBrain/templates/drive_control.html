@@ -1,9 +1,34 @@
 {% extends "layout.html" %}
 {% block body %}
-	<h1>Velocity menu</h1>
+	<h1>Drive Robot</h1>
 	<a href="{{url_for('root_menu', address=rcAddr)}}">Back</a>
 	<hr/>	
-	<a href="{{url_for('stop', address=rcAddr)}}">STOP MOTORS</a>
+	<a href="{{url_for('stop', address=rcAddr)}}"><h1>STOP MOTORS</h1></a>
 	<hr/>
-	{{placeholder}}
+	<h1>Drive Forward/Back</h1>
+	<form action="{{ url_for('drive_control', address=rcAddr)}}" method="post">
+		<input type="hidden" name="movement" value="linear"/>
+		Number of wheel rotations, negative number moves backwards.
+		<input type="range" name="distance" id="distanceInput" min="-10" max="10" value="0" onchange="document.getElementById('distanceNumber').value = document.getElementById('distanceInput').value"/>
+		<input type="number" name="distanceNumber" id="distanceNumber" value="0"/>
+		<br/>
+		Speed <input type="number" name="speed" id="speed" value="{{speed}}"/>
+		<input type="submit" value="Go!"/>
+	</form>
+	<hr/>
+	<h1>Turn In Place</h1>
+	<form action="{{ url_for('drive_control', address=rcAddr)}}" method="post">
+		<input type="hidden" name="movement" value="rotation"/>
+		Degrees to turn. Positive number is clockwise, negative counterclockwise.
+		<input type="range" name="rotation" id="rotationInput" min="-180" max="180" step="15" value="0" onchange="document.getElementById('rotationNumber').value = document.getElementById('rotationInput').value"/>
+		<input type="number" name="rotationNumber" id="rotationNumber" value="0"/>
+		<br/>
+		Speed <input type="number" name="speed" id="speed" value="{{speed}}"/>
+		<input type="submit" value="Go!"/>
+		<hr/>
+		(Tuning) Encoder Pulses Per Rotation
+		<input type="number" name="rotationPulses" id="rotationPulses" value="{{eppr}}"/>
+	</form>
+	<hr/>
+	<h1>
 {% endblock %}
