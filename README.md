@@ -1,9 +1,10 @@
 # RogerPiBot
 Raspberry Pi-driven robot project
 
-dependencies 
-pip
-python
+## Dependencies 
+- pip
+- python
 
-pip install flask 
-pip install pyserial
+## Install Python libraries
+- pip install flask  
+- pip install pyserial
