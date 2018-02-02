@@ -3,6 +3,7 @@
 from flask import Flask, flash, g, redirect, render_template, request, session, url_for
 import os
 from roboclaw import Roboclaw
+from roboclaw_stub import Roboclaw_stub
 
 defaultAccelDecel = 2400
 defaultSpeed = 240
@@ -136,8 +137,13 @@ def connect_menu():
 		interCharTimeout = float(request.form['interCharTimeout'])
 		retries = int(request.form['retries'])
 
-		# Create the Roboclaw object against the specified serial port
-		newrc = Roboclaw(portName,baudrate,interCharTimeout,retries)
+		if portName == 'Test_Stub':
+			# No RoboClaw - use the test stub.
+			newrc = Roboclaw_stub()
+		else:	
+			# Create the Roboclaw object against the specified serial port
+			newrc = Roboclaw(portName,baudrate,interCharTimeout,retries)
+
 		if newrc.Open():
 			rc = newrc
 			flash(successPrefix + "Roboclaw API connected to " + portName)
