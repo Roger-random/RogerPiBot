@@ -513,7 +513,7 @@ def drive_control():
 			session['speed'] = speed = int(request.form['speed'])
 			if request.form['movement'] == "linear":
 				distance = int(request.form['distanceNumber'])
-				m1delta = m2delta = distance * 2400
+				m1delta = m2delta = distance * 7200
 			elif request.form['movement'] == "rotation":
 				session['eppr'] = eppr = int(request.form['rotationPulses'])
 				rotation = int(request.form['rotationNumber'])
