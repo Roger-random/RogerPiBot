@@ -38,10 +38,10 @@ class Roboclaw_stub:
 		return True
 
 	def ReadEncM1(self,address):
-		return (1, self.encoderM1)
+		return (1, self.encoderM1, 0)
 
 	def ReadEncM2(self,address):
-		return (1, self.encoderM2)
+		return (1, self.encoderM2, 0)
 
 	def ReadVersion(self,address):
 		return (1, "RoboClaw API Test Stub")
