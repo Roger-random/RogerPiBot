@@ -1,7 +1,18 @@
 {% extends "layout.html" %}
 {% block body %}
-	<h1>Basic Motor Smoke Test</h1>
+	<h1>Basic Motor Test</h1>
+	<h3>Motor 1</h3>
+	<p>Encoder 1:<div id="m1enc">{{m1enc}}</div></p>
 	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
-		<input type="submit" value="Go!"/>
+		<input type="hidden" value="m1+"/>
+		<input type="submit" value="Positive"/>
+	</form>
+	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
+		<input type="hidden" value="m10"/>
+		<input type="submit" value="Stop"/>
+	</form>
+	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
+		<input type="hidden" value="m1-"/>
+		<input type="submit" value="Negative"/>
 	</form>
 {% endblock %}

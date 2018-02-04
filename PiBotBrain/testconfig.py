@@ -1,6 +1,6 @@
 # App to configure Roboclaw and test PID values
 
-from flask import Flask, flash, g, redirect, render_template, request, session, url_for
+from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
 import os
 from roboclaw import Roboclaw
 from roboclaw_stub import Roboclaw_stub
@@ -52,20 +52,23 @@ def checkRoboclawAddress():
 	global rc
 	# Do we have Roboclaw API object?
 	if rc is None:
-		flash(errorPrefix + "Roboclaw API not initialized")
-		raise ValueError
+		msg = errorPrefix + "Roboclaw API not initialized"
+		flash(msg)
+		raise ValueError(msg)
 
 	# Do we have a Roboclaw address?
 	rcAddr = tryParseAddress(request.args.get('address'), default=None)
 	if rcAddr is None:
-		flash(errorPrefix + "Valid address parameter required")
-		raise ValueError
+		msg = errorPrefix + "Valid address parameter required"
+		flash(msg)
+		raise ValueError(msg)
 
 	# Is there a Roboclaw at that address?
 	versionQuery = rc.ReadVersion(rcAddr)
 	if versionQuery[0] == 0:
-		flash(errorPrefix + "No Roboclaw response at {0} ({0:#x})".format(rcAddr))
-		raise ValueError
+		msg = errorPrefix + "No Roboclaw response at {0} ({0:#x})".format(rcAddr)
+		flash(msg)
+		raise ValueError(msg)
 
 	return (rc, rcAddr)
 
@@ -78,9 +81,11 @@ def checkRoboclawAddress():
 # element tuple) If there are more tha one, the result is a tuple.
 def readResult(resultTuple, flashMessage=None):
 	if resultTuple[0] == 0:
+		msg = str(resultTuple)
 		if flashMessage is not None:
-			flash(errorPrefix + "{} {}".format(flashMessage, str(resultTuple)))
-		raise ValueError
+			msg = errorPrefix + "{} {}".format(flashMessage, str(resultTuple))
+			flash(msg)
+		raise ValueError(msg)
 
 	if len(resultTuple) == 2:
 		return resultTuple[1]
@@ -94,7 +99,7 @@ def writeResult(result, flashMessage=None):
 	if not result:
 		if flashMessage is not None:
 			flash(errorPrefix + flashMessage)
-		raise ValueError
+		raise ValueError(flashMessage)
 	elif flashMessage is not None:
 		flash(successPrefix + flashMessage)
 
@@ -298,6 +303,22 @@ def encoder():
 
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
+
+# Low overhead method to retrieve encoder values as JSON. For the sake of
+# simple client, ensure the output JSON is always the same format regardless
+# of success or error.
+
+@app.route('/encoder_json', methods=['GET'])
+def encoder_json():
+	try:
+		rc,rcAddr = checkRoboclawAddress()
+
+		m1enc, m1encStatus = readResult(rc.ReadEncM1(rcAddr), "Read M1 encoder")
+		m2enc, m2encStatus = readResult(rc.ReadEncM2(rcAddr), "Read M2 encoder")
+
+		return jsonify(m1enc=m1enc, m2enc=m2enc, m1encStatus=m1encStatus, m2encStatus=m2encStatus, result="success")
+	except ValueError as ve:
+		return jsonify(m1enc=0, m2enc=0, m1encStatus=0, m2encStatus=0, result=str(ve))
 
 # Velocity menu deals with the parameters involved in moving at a target velocity.
 # Usually in terms of quadrature encoder pulses per second.
@@ -552,9 +573,13 @@ def drive_control():
 def basic_motor():
 	try:
 		rc,rcAddr = checkRoboclawAddress()
+
+		m1enc, m1encStatus = readResult(rc.ReadEncM1(rcAddr), "Read M1 encoder")
+		m2enc, m2encStatus = readResult(rc.ReadEncM2(rcAddr), "Read M2 encoder")
+
 		if request.method == 'GET':
 			return render_template("basic_motor.html", rcAddr=rcAddr,
-				)
+				m1enc=m1enc, m2enc=m2enc)
 		elif request.method == 'POST':
 			flash(errorPrefix + "Basic Motor Test placeholder")
 			return redirect(url_for('basic_motor',address=rcAddr))
