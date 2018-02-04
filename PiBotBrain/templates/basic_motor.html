@@ -1,18 +1,44 @@
 {% extends "layout.html" %}
 {% block body %}
+	<script>
+	setTimeout(updateEnc, 1000);
+
+	function updateEnc() {
+	  var xhttp = new XMLHttpRequest();
+	  xhttp.onreadystatechange = function() {
+	    if (this.readyState == 4) { 
+	      	if (this.status == 200)  {
+	      		var response = JSON.parse(this.responseText);
+	      		document.getElementById("m1enc").innerHTML = response.m1enc;
+			 	setTimeout(updateEnc, 1000);
+			}
+			else
+			{
+				document.getElementById("m1enc").innerHTML = "HTTP Status = " + this.status
+			}
+	    }
+	  };
+	  xhttp.open("GET", "encoder_json?address={{rcAddr}}", true);
+	  xhttp.send();
+	}
+	</script>
+
 	<h1>Basic Motor Test</h1>
 	<h3>Motor 1</h3>
 	<p>Encoder 1:<div id="m1enc">{{m1enc}}</div></p>
 	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
-		<input type="hidden" value="m1+"/>
+		<input type="hidden" name="motor" value="1"/>
+		<input type="hidden" name="direction" value="+"/>
 		<input type="submit" value="Positive"/>
 	</form>
 	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
-		<input type="hidden" value="m10"/>
+		<input type="hidden" name="motor" value="1"/>
+		<input type="hidden" name="direction" value="0"/>
 		<input type="submit" value="Stop"/>
 	</form>
 	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
-		<input type="hidden" value="m1-"/>
+		<input type="hidden" name="motor" value="1"/>
+		<input type="hidden" name="direction" value="-"/>
 		<input type="submit" value="Negative"/>
 	</form>
 {% endblock %}

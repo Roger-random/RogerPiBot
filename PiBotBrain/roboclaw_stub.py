@@ -34,7 +34,13 @@ class Roboclaw_stub:
 	def ForwardM1(self,address,val):
 		return True
 
-	def ForwardM2(self,address,val):
+	def BackwardM1(self,address,val):
+		return True
+
+ 	def ForwardM2(self,address,val):
+		return True
+
+	def BackwardM2(self,address,val):
 		return True
 
 	def ReadEncM1(self,address):

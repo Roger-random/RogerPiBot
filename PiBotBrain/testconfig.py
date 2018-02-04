@@ -579,9 +579,32 @@ def basic_motor():
 
 		if request.method == 'GET':
 			return render_template("basic_motor.html", rcAddr=rcAddr,
-				m1enc=m1enc, m2enc=m2enc)
+				m1enc=m1enc, m2enc=m2enc, m1encStatus=m1encStatus, m2encStatus=m2encStatus)
 		elif request.method == 'POST':
-			flash(errorPrefix + "Basic Motor Test placeholder")
+			motor = int(request.form['motor'])
+			direction = request.form['direction']
+
+			if motor == 1:
+				if direction == '+':
+					flash("1+")
+					rc.ForwardM1(rcAddr, 50)
+				elif direction == '-':
+					flash("1-")
+					rc.BackwardM1(rcAddr, 50)
+				else:
+					flash("1 Stop")
+					rc.ForwardM1(rcAddr, 0)
+			else:
+				if direction == '+':
+					flash("2+")
+					rc.ForwardM2(rcAddr, 50)
+				elif direction == '-':
+					flash("2-")
+					rc.BackwardM2(rcAddr, 50)
+				else:
+					flash("2 Stop")
+					rc.ForwardM2(rcAddr, 0)
+
 			return redirect(url_for('basic_motor',address=rcAddr))
 		else:
 			flash(errorPrefix + "Unexpected request.method on drive_control")
