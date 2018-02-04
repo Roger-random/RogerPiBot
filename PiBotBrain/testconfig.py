@@ -546,3 +546,20 @@ def drive_control():
 			return redirect(url_for('drive_control',address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
+
+
+@app.route('/basic_motor', methods=['GET','POST'])
+def basic_motor():
+	try:
+		rc,rcAddr = checkRoboclawAddress()
+		if request.method == 'GET':
+			return render_template("basic_motor.html", rcAddr=rcAddr,
+				)
+		elif request.method == 'POST':
+			flash(errorPrefix + "Basic Motor Test placeholder")
+			return redirect(url_for('basic_motor',address=rcAddr))
+		else:
+			flash(errorPrefix + "Unexpected request.method on drive_control")
+			return redirect(url_for('basic_motor',address=rcAddr))
+	except ValueError as ve:
+		return redirect(url_for('root_menu'))

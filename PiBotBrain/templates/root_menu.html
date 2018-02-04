@@ -10,8 +10,10 @@
 			<a href="{{url_for('position_menu', address=address)}}">Position</a>
 			<a href="{{url_for('rc_error', address=address)}}">ErrorCode</a>
 			<a href="{{url_for('writenvm', address=address)}}">Write NVM</a>
-			<hr>
+			<hr/>
 			<a href="{{url_for('drive_control', address=address)}}"><h1>Drive Robot</h1></a>
+			<hr/>
+			<a href="{{url_for('basic_motor', address=address)}}"><h1>Basic Motor Test</h1></a>
 		{% endif %}
 		<hr/>
 	{% endif %}

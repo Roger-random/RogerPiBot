@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h1>Basic Motor Smoke Test</h1>
+	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
+		<input type="submit" value="Go!"/>
+	</form>
+{% endblock %}
