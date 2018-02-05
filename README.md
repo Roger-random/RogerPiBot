@@ -25,3 +25,4 @@ First attempt at a robot controller, focused on test and configuration tasks.
 - Tell Flask which Python file to run: `export FLASK_APP=testconfig.py`
 - (For development purposes only) turn on debug mode: `export FLASK_DEBUG=1`
 - Launch Flask: `flask run`
+- Open app in web browser. The exact URL is shown when running `flask run`, probably `http://localhost:5000`
