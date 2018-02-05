@@ -36,40 +36,62 @@
 	<h1>Basic Motor Test</h1>
 	<p>Encoder Read Status:<div id="encStatus">OK</div></p>
 	<hr/>
-	<h3>Motor 1</h3>
-	<p>Encoder 1:<div id="m1enc">{{m1enc}}</div></p>
-	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
-		<input type="hidden" name="motor" value="1"/>
-		<input type="hidden" name="direction" value="+"/>
-		<input type="submit" value="Positive"/>
-	</form>
-	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
-		<input type="hidden" name="motor" value="1"/>
-		<input type="hidden" name="direction" value="0"/>
-		<input type="submit" value="Stop"/>
-	</form>
-	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
-		<input type="hidden" name="motor" value="1"/>
-		<input type="hidden" name="direction" value="-"/>
-		<input type="submit" value="Negative"/>
-	</form>
+	<div class="row">
+		<div class="col-sm-6 m1">
+			<h3>Motor 1</h3>
+			<p>Encoder 1:<div id="m1enc">{{m1enc}}</div></p>
+			<div class="row">
+				<div class="col-3 positive">
+					<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
+						<input type="hidden" name="motor" value="1"/>
+						<input type="hidden" name="direction" value="+"/>
+						<input type="submit" value="Positive"/>
+					</form>
+				</div>
+				<div class="col-3 stop">
+					<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
+						<input type="hidden" name="motor" value="1"/>
+						<input type="hidden" name="direction" value="0"/>
+						<input type="submit" value="Stop"/>
+					</form>
+				</div>
+				<div class="col-3 negative">
+					<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
+						<input type="hidden" name="motor" value="1"/>
+						<input type="hidden" name="direction" value="-"/>
+						<input type="submit" value="Negative"/>
+					</form>
+				</div>
+			</div><!--row-->
+			<!--<hr/>-->
+		</div><!-- col-sm-6 -->
 
 	<hr/>
-	<h3>Motor 2</h3>
-	<p>Encoder 2:<div id="m2enc">{{m2enc}}</div></p>
-	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
-		<input type="hidden" name="motor" value="2"/>
-		<input type="hidden" name="direction" value="+"/>
-		<input type="submit" value="Positive"/>
-	</form>
-	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
-		<input type="hidden" name="motor" value="2"/>
-		<input type="hidden" name="direction" value="0"/>
-		<input type="submit" value="Stop"/>
-	</form>
-	<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
-		<input type="hidden" name="motor" value="2"/>
-		<input type="hidden" name="direction" value="-"/>
-		<input type="submit" value="Negative"/>
-	</form>
+		<div class="col-sm-6 m2">
+			<h3>Motor 2</h3>
+			<p>Encoder 2:<div id="m2enc">{{m2enc}}</div></p>
+			<div class="row">
+				<div class="col-3">
+					<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
+						<input type="hidden" name="motor" value="2"/>
+						<input type="hidden" name="direction" value="+"/>
+						<input type="submit" value="Positive"/>
+					</form>
+				</div>
+				<div class="col-3">
+				<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
+					<input type="hidden" name="motor" value="2"/>
+					<input type="hidden" name="direction" value="0"/>
+					<input type="submit" value="Stop"/>
+				</form>
+			</div>
+			<div class="col-3">
+				<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
+					<input type="hidden" name="motor" value="2"/>
+					<input type="hidden" name="direction" value="-"/>
+					<input type="submit" value="Negative"/>
+				</form>
+			</div>
+			<hr/>
+		</div>
 {% endblock %}
