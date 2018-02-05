@@ -31,32 +31,88 @@ class Roboclaw_stub:
 		self.ppm1 = self.pim1 = self.pdm1 = self.pimaxm1 = self.pdeadm1 = self.pminm1 = self.pmaxm1 = 0
 		self.ppm2 = self.pim2 = self.pdm2 = self.pimaxm2 = self.pdeadm2 = self.pminm2 = self.pmaxm2 = 0
 
+		# Values used to simulate a virtual encoder that moves in response to
+		# motor commands.
+		self.m1move = None # None, "vel"ocity, "pos"ition
+		self.m1target = None # When "vel" = encoder counts per second. When "pos" = destination encoder.
+		self.m1timeStart = None # Value of time.time() when movement started.
+		self.m1encStart = None # Value of encoder when movement started.
+
+		self.m2move = None # None, "vel"ocity, "pos"ition
+		self.m2target = None # When "vel" = encoder counts per second. When "pos" = destination encoder.
+		self.m2timeStart = None # Value of time.time() when movement started.
+		self.m2encStart = None # Value of encoder when movement started.
+
 	def ForwardM1(self,address,val):
+		if val == 0:
+			self.m1move = None
+		else:
+			self.m1move = "vel"
+			self.m1target = val
+			self.m1start = time.time()
+			self.m1encStart = self.encoderM1
 		return True
 
 	def BackwardM1(self,address,val):
+		if val == 0:
+			self.m1move = None
+		else:
+			self.m1move = "vel"
+			self.m1target = -val
+			self.m1start = time.time()
+			self.m1encStart = self.encoderM1
 		return True
 
  	def ForwardM2(self,address,val):
+		if val == 0:
+			self.m2move = None
+		else:
+			self.m2move = "vel"
+			self.m2target = val
+			self.m2start = time.time()
+			self.m2encStart = self.encoderM2
 		return True
 
 	def BackwardM2(self,address,val):
+		if val == 0:
+			self.m2move = None
+		else:
+			self.m2move = "vel"
+			self.m2target = -val
+			self.m2start = time.time()
+			self.m2encStart = self.encoderM2
 		return True
 
 	def ReadEncM1(self,address):
+		if self.m1move == "vel":
+			self.encoderM1 = int(self.m1encStart + (time.time() - self.m1start)*self.m1target)
+		elif self.m1move == "pos":
+			# Placeholder - instantly move to target.
+			self.encoderM1 = self.m1target
+			self.m1move = None
 		return (1, self.encoderM1, 0)
 
 	def ReadEncM2(self,address):
+		if self.m2move == "vel":
+			self.encoderM2 = int(self.m2encStart + (time.time() - self.m2start)*self.m2target)
+		elif self.m2move == "pos":
+			# Placeholder - instantly move to target.
+			self.encoderM2 = self.m2target
+			self.m2move = None
 		return (1, self.encoderM2, 0)
 
 	def ReadVersion(self,address):
 		return (1, "RoboClaw API Test Stub")
 
 	def SetEncM1(self,address,cnt):
+		self.m1start = time.time()
+		self.m1encStart = cnt
 		self.encoderM1 = cnt
 		return True
 
 	def SetEncM2(self,address,cnt):
+		self.m2start = time.time()
+		self.m2encStart = cnt
 		self.encoderM2 = cnt
 		return True
 

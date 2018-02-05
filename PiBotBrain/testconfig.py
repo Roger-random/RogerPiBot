@@ -586,23 +586,17 @@ def basic_motor():
 
 			if motor == 1:
 				if direction == '+':
-					flash("1+")
 					rc.ForwardM1(rcAddr, 50)
 				elif direction == '-':
-					flash("1-")
 					rc.BackwardM1(rcAddr, 50)
 				else:
-					flash("1 Stop")
 					rc.ForwardM1(rcAddr, 0)
 			else:
 				if direction == '+':
-					flash("2+")
 					rc.ForwardM2(rcAddr, 50)
 				elif direction == '-':
-					flash("2-")
 					rc.BackwardM2(rcAddr, 50)
 				else:
-					flash("2 Stop")
 					rc.ForwardM2(rcAddr, 0)
 
 			return redirect(url_for('basic_motor',address=rcAddr))
