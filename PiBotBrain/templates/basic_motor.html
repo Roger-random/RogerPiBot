@@ -32,14 +32,15 @@
 	  xhttp.send();
 	}
 	</script>
-
-	<h1>Basic Motor Test</h1>
-	<p>Encoder Read Status:<div id="encStatus">OK</div></p>
+	
+	<h1 class="h1">Basic Motor Test</h1>
+	<p>Encoder Read Status: <span id="encStatus">OK</span></p>
 	<hr/>
+	
 	<div class="row">
-		<div class="col-sm-6 m1">
+		<div class="col-6 m1">
 			<h3>Motor 1</h3>
-			<p>Encoder 1:<div id="m1enc">{{m1enc}}</div></p>
+			<p>Encoder 1: <span id="m1enc">{{m1enc}}</span></p>
 			<div class="row">
 				<div class="col-3 positive">
 					<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
@@ -67,9 +68,9 @@
 		</div><!-- col-sm-6 -->
 
 	<hr/>
-		<div class="col-sm-6 m2">
+		<div class="col-6 m2">
 			<h3>Motor 2</h3>
-			<p>Encoder 2:<div id="m2enc">{{m2enc}}</div></p>
+			<p>Encoder 2: <span id="m2enc">{{m2enc}}</span></p>
 			<div class="row">
 				<div class="col-3">
 					<form action="{{ url_for('basic_motor', address=rcAddr)}}" method="post">
