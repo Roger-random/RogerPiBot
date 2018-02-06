@@ -12,7 +12,7 @@ First attempt at a robot controller, focused on test and configuration tasks.
 - `virtualenv` recommended to help keep Python libraries manageable
   - Install VirtualEnv `pip install virtualenv`
   - Switch to PiBotBrain directory `cd RogerPiBot/PiBotBrain`
-  - Create new virtual environment `virtualenv venv`
+  - Create new virtual environment `python -m virtualenv venv`
   - Activate virtual environment `. venv/bin/activate` Command prompt should be prepended with `(venv)` after activation.
 - Install Python libraries required for this project
   - Serial port library `pip install pyserial`
