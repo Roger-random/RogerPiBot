@@ -1,10 +1,27 @@
 <!doctype html>
-<title>PiBot Brain</title>
-<link rel=stylesheet type=text/css href="{{url_for('static', filename='style.css')}}">
-<div class=page>
-	{% for message in get_flashed_messages() %}
-		<div class=flash>{{message}}</div>
-		<hr/>
-	{% endfor %}
-	{% block body %}{% endblock %}
+	<head>
+		<title>PiBot Brain</title>
+		<meta charset="utf-8">
+		<!-- Bootstrap -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		 <!--Responsive Design -->
+	    
+    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	    <!---Font Awesome -->
+	    <script src="https://use.fontawesome.com/1d2ee0eb57.js"></script>
+	    		    
+		<link rel="stylesheet" type="text/css" href=".{{url_for('static', filename='style.css')}}">
+		
+	</head>
+	<body>
+		<div class="container">
+			<div class=page>
+				{% for message in get_flashed_messages() %}
+					<div class=flash>{{message}}</div>
+					<hr/>
+				{% endfor %}
+				{% block body %}{% endblock %}
+			</div>
+		</div>
+	</body>
 </div>
