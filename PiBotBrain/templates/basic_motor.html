@@ -32,17 +32,20 @@
 	  xhttp.send();
 	}
 	</script>
-	
-	<h1 class="h1">Basic Motor Test</h1>
+	<header>
+		<div class="row header">
+			<div class="col-3">
+				<a class="home" href="{{url_for('root_menu', address=rcAddr)}}">home</a>
+			</div>
+			<div class="col-6">
+				<h1 class="h1">Basic Motor Test</h1>
+			</div>
+			<div class="col-3">
+				<a class="e-stop" href="{{url_for('stop', address=rcAddr)}}">STOP MOTORS</a>
+			</div>
+		</div>
+	</header>
 	<p>Encoder Read Status: <span id="encStatus">OK</span></p>
-	<hr/>
-	<div class="row">
-		<div class="col-6">
-			<a class="e-stop" href="{{url_for('stop', address=rcAddr)}}">STOP MOTORS</a>
-		</div>
-		<div class="col-6">
-			<a class="home" href="{{url_for('root_menu', address=rcAddr)}}">Back</a>
-		</div>
 	<hr/>
 	<div class="row">
 		<div class="col-6 m1">
