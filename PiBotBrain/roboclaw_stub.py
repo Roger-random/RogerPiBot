@@ -63,7 +63,7 @@ class Roboclaw_stub:
 			self.m1encStart = self.encoderM1
 		return True
 
- 	def ForwardM2(self,address,val):
+	def ForwardM2(self,address,val):
 		if val == 0:
 			self.m2move = None
 		else:
