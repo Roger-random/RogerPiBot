@@ -4,19 +4,53 @@
 	padding-top: 3px;
 	padding-bottom: 3px;
 }
-.negative {
-	background: yellow;
-	padding-right: 2%
-	width: 30%;
-
-
+.stop-box {
+	text-align: center;
+	margin-bottom: 1em;
 }
-.stop {
+.e-stop {
 	background: red;
-	padding-right: 2%;
-	width: 30%;
+	font-weight: 700;
+	border: 3px solid black;
+	border-radius: 10px;
+	padding: .5em;
+	color: white;
 }
-.positive {
+.home {
+	font-weight: 700;
+	margin-right: .5em;
+	border: 3px solid blue;
+    border-radius: 10px;
+    padding-top: .5em;
+    padding-right: 1em;
+    padding-bottom: .5em;
+    padding-left: 1em; 
+}
+input {
+	font-weight: 700;
+	margin-right: .5em;
+	border: 3px solid black;
+    border-radius: 10px;
+    padding-top: .5em;
+    padding-right: 1em;
+    padding-bottom: .5em;
+    padding-left: 1em;   
+}
+input.negative {
+	background: yellow;
+}
+input.stop {
+	background: red;
+	padding-right: 2em;
+    padding-left: 2em;
+}
+input.positive {
 	background: skyblue;
-	width: 30%;
+	
 }
+/*@media only (min-width: 992px){
+	input.negative{
+		padding-right: 2em;
+		padding-left: 2em;
+	}
+}*/
