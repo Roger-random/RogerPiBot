@@ -105,14 +105,12 @@ class Roboclaw_stub:
 		return (1, "RoboClaw API Test Stub")
 
 	def SetEncM1(self,address,cnt):
-		self.m1start = time.time()
-		self.m1encStart = cnt
+		self.m1move = None
 		self.encoderM1 = cnt
 		return True
 
 	def SetEncM2(self,address,cnt):
-		self.m2start = time.time()
-		self.m2encStart = cnt
+		self.m2move = None
 		self.encoderM2 = cnt
 		return True
 
@@ -125,6 +123,20 @@ class Roboclaw_stub:
 		return True
 
 	def SpeedM1M2(self,address,m1,m2):
+		if m1 == 0:
+			self.m1move = None
+		else:
+			self.m1move = "vel"
+			self.m1target = m1
+			self.m1start = time.time()
+			self.m1encStart = self.encoderM1
+		if m2 == 0:
+			self.m2move = None
+		else:
+			self.m2move = "vel"
+			self.m2target = m2
+			self.m2start = time.time()
+			self.m2encStart = self.encoderM2
 		return True
 
 	def ReadM1VelocityPID(self,address):
