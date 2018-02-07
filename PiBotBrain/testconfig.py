@@ -7,8 +7,8 @@ from roboclaw_stub import Roboclaw_stub
 
 defaultAccelDecel = 2400
 defaultSpeed = 240
-errorPrefix = "ERROR: "
-successPrefix = "SUCCESS: "
+errorCategory = "error"
+successCategory = "success"
 
 app = Flask(__name__)
 
@@ -52,22 +52,22 @@ def checkRoboclawAddress():
 	global rc
 	# Do we have Roboclaw API object?
 	if rc is None:
-		msg = errorPrefix + "Roboclaw API not initialized"
-		flash(msg)
+		msg = "Roboclaw API not initialized"
+		flash(msg, errorCategory)
 		raise ValueError(msg)
 
 	# Do we have a Roboclaw address?
 	rcAddr = tryParseAddress(request.args.get('address'), default=None)
 	if rcAddr is None:
-		msg = errorPrefix + "Valid address parameter required"
-		flash(msg)
+		msg = "Valid address parameter required"
+		flash(msg, errorCategory)
 		raise ValueError(msg)
 
 	# Is there a Roboclaw at that address?
 	versionQuery = rc.ReadVersion(rcAddr)
 	if versionQuery[0] == 0:
-		msg = errorPrefix + "No Roboclaw response at {0} ({0:#x})".format(rcAddr)
-		flash(msg)
+		msg = "No Roboclaw response at {0} ({0:#x})".format(rcAddr)
+		flash(msg, errorCategory)
 		raise ValueError(msg)
 
 	return (rc, rcAddr)
@@ -83,8 +83,8 @@ def readResult(resultTuple, flashMessage=None):
 	if resultTuple[0] == 0:
 		msg = str(resultTuple)
 		if flashMessage is not None:
-			msg = errorPrefix + "{} {}".format(flashMessage, str(resultTuple))
-			flash(msg)
+			msg = "{} {}".format(flashMessage, str(resultTuple))
+			flash(msg, errorCategory)
 		raise ValueError(msg)
 
 	if len(resultTuple) == 2:
@@ -94,14 +94,14 @@ def readResult(resultTuple, flashMessage=None):
 
 # Every write operation returns True if successful. This helper looks for a
 # False and raises an exception when it happens. Optional flash message is 
-# placed in flash prepended with ERROR or SUCCESS depending on condition.
+# placed in flash with error or success category as appropriate.
 def writeResult(result, flashMessage=None):
 	if not result:
 		if flashMessage is not None:
-			flash(errorPrefix + flashMessage)
+			flash(flashMessage, errorCategory)
 		raise ValueError(flashMessage)
 	elif flashMessage is not None:
-		flash(successPrefix + flashMessage)
+		flash(flashMessage, successCategory)
 
 # Root menu
 @app.route('/')
@@ -151,13 +151,13 @@ def connect_menu():
 
 		if newrc.Open():
 			rc = newrc
-			flash(successPrefix + "Roboclaw API connected to " + portName)
+			flash("Roboclaw API connected to " + portName, successCategory)
 			return redirect(url_for('root_menu', address="0x80"))
 		else:
-			flash(errorPrefix + "Roboclaw API could not open " + portName)
+			flash("Roboclaw API could not open " + portName, errorCategory)
 			return redirect(url_for('connect_menu'))
 	else:
-		flash(errorPrefix + "Unexpected request method on connect")
+		flash("Unexpected request method on connect", errorCategory)
 		return redirect(url_for('connect_menu'))
 
 # Config menu pulls down the current values of the general settings we care 
@@ -223,7 +223,7 @@ def config_menu():
 
 			return redirect(url_for('config_menu',address=rcAddr))
 		else:
-			flash(errorPrefix + "Unexpected request.method on config")
+			flash("Unexpected request.method on config", errorCategory)
 			return redirect(url_for('config_menu',address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
@@ -298,7 +298,7 @@ def encoder():
 
 			return redirect(url_for('root_menu', address=rcAddr))
 		else:
-			flash(errorPrefix + "Unexpected request.method on encoder")
+			flash("Unexpected request.method on encoder", errorCategory)
 			return redirect(url_for('encoder',address=rcAddr))
 
 	except ValueError as ve:
@@ -381,7 +381,7 @@ def velocity_menu():
 
 			return redirect(url_for('velocity_menu',address=rcAddr))
 		else:
-			flash(errorPrefix + "Unexpected request.method on velocity")
+			flash("Unexpected request.method on velocity", errorCategory)
 			return redirect(url_for('velocity_menu',address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
@@ -480,7 +480,7 @@ def position_menu():
 
 			return redirect(url_for('position_menu',address=rcAddr))
 		else:
-			flash(errorPrefix + "Unexpected request.method on position")
+			flash("Unexpected request.method on position", errorCategory)
 			return redirect(url_for('position_menu',address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
@@ -493,7 +493,7 @@ def to_position():
 
 		# TODO sanity validation of these values from the HTML form
 		# Pull values from form, update them in session dictionary.
-		session['m1accel'] = m1accel = int(request.form['m1accel'])		
+		session['m1accel'] = m1accel = int(request.form['m1accel'])
 		session['m2accel'] = m2accel = int(request.form['m2accel'])
 		session['m1speed'] = m1speed = int(request.form['m1speed'])
 		session['m2speed'] = m2speed = int(request.form['m2speed'])
@@ -541,7 +541,7 @@ def drive_control():
 				m1delta = int(rotation * eppr / 360)
 				m2delta = -m1delta
 			else:
-				flash(errorPrefix + "Unknown movement type")
+				flash("Unknown movement type", errorCategory)
 
 			m1accel = session.get('m1accel', defaultAccelDecel)
 			m2accel = session.get('m2accel', defaultAccelDecel)
@@ -563,7 +563,7 @@ def drive_control():
 
 			return redirect(url_for('drive_control',address=rcAddr))
 		else:
-			flash(errorPrefix + "Unexpected request.method on drive_control")
+			flash("Unexpected request.method on drive_control", errorCategory)
 			return redirect(url_for('drive_control',address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
@@ -601,7 +601,7 @@ def basic_motor():
 
 			return redirect(url_for('basic_motor',address=rcAddr))
 		else:
-			flash(errorPrefix + "Unexpected request.method on drive_control")
+			flash("Unexpected request.method on drive_control", errorCategory)
 			return redirect(url_for('basic_motor',address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))

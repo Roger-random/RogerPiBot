@@ -31,6 +31,16 @@
     padding-bottom: .5em;
     padding-left: 1em; 
 }
+.flash {
+	background: gray;
+	color: white;
+}
+.flash.success {
+	background: darkgreen;
+}
+.flash.error {
+	background: maroon;
+}
 input {
 	font-weight: 700;
 	margin-right: .5em;
