@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
 	{% if address is not none %}
-		<p>{{response}}</p>
 		{% if display %}
 			<a href="{{url_for('stop', address=address)}}">STOP MOTORS</a>
+			<a href="{{url_for('connect_menu')}}">Connection</a>
 			<a href="{{url_for('config_menu', address=address)}}">Configuration</a>
 			<a href="{{url_for('encoder', address=address)}}">Encoder</a>
 			<a href="{{url_for('velocity_menu', address=address)}}">Velocity</a>

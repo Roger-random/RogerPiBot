@@ -106,35 +106,44 @@ def writeResult(result, flashMessage=None):
 # Root menu
 @app.route('/')
 def root_menu():
+	global rc
 	if rc is None:
-		return redirect(url_for('connect_menu'))
-	rcAddr = tryParseAddress(request.args.get('address'), default=None)
+		# Roboclaw directly connected on USB usually show up as /dev/ttyACM0
+		# and sometimes /dev/ttyACM1
+		acmList = [dev for dev in os.listdir("/dev") if dev.startswith("ttyACM")]
+		for acm in acmList:
+			newrc = Roboclaw("/dev/"+acm, 115200, 0.01, 3)
+			if newrc.Open():
+				rc = newrc
+				break
+		# Failed to connect to USB, fall back to test stub.
+		if rc is None:
+			rc = Roboclaw_stub()
+
+	rcAddr = tryParseAddress(request.args.get('address'), default=128)
 
 	displayMenu = False
 	if rcAddr is not None:
 		try:
 			verString = readResult(rc.ReadVersion(rcAddr))
-			roboResponse = "Roboclaw at address {0} ({0:#x}) version: {1}".format(rcAddr, verString)
+			flash("Roboclaw at address {0} ({0:#x}) version: {1}".format(rcAddr, verString), successCategory)
 			displayMenu = True
 		except ValueError as ve:
-			roboResponse = "No Roboclaw response from address {0} ({0:#x})".format(rcAddr)
+			flash("No Roboclaw response from address {0} ({0:#x})".format(rcAddr), errorCategory)
 
 	else:
 		roboResponse = None
 
-	return render_template("root_menu.html", response=roboResponse, display=displayMenu, address=rcAddr)
+	return render_template("root_menu.html", display=displayMenu, address=rcAddr)
 
 
-# Connect menu let's the user specify serial port parameters for creating
+# Connect menu lets the user specify serial port parameters for creating
 # a Roboclaw object
 @app.route('/connect', methods=['GET', 'POST'])
 def connect_menu():
 	global rc
 	if request.method == 'GET':
-		if rc is None:
-			return render_template("connect_menu.html")
-		else:
-			return redirect(url_for('root_menu'))
+		return render_template("connect_menu.html")
 	elif request.method == 'POST':
 		# TODO sanity validation of these values from the HTML form
 		portName = request.form['port']
