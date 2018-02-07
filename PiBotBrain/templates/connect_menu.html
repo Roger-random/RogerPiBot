@@ -4,8 +4,12 @@
 	<p>
 		Select one of the common values below, or type in name of a port, then click "Connect": 
 		<ul>
-		<li><button onclick="document.getElementById('serialPortInput').value='/dev/ttyACM0'">USB Serial</button></li>
-		<li><button onclick="document.getElementById('serialPortInput').value='Test_Stub'">No RoboClaw - use test stub</button></li>
+			<!-- list all the potential real devices -->
+			{% for device in potentialDevices %}
+			<li><button onclick="document.getElementById('serialPortInput').value='/dev/{{device}}'">{{device}}</button></li>
+			{% endfor %}
+			<!-- ... plus the test stub -->
+			<li><button onclick="document.getElementById('serialPortInput').value='Test_Stub'">No RoboClaw</button></li>
 		</ul>
 	</p>
 	<br/>

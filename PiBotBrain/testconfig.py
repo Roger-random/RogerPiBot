@@ -103,16 +103,20 @@ def writeResult(result, flashMessage=None):
 	elif flashMessage is not None:
 		flash(flashMessage, successCategory)
 
+# Roboclaw directly connected on USB usually show up as /dev/ttyACM0
+# and sometimes /dev/ttyACM1 on Raspberry Pi & PC. On MacOS it has
+# shown up as /dev/ttyusbmodem. In both cases USB serial bridges
+# announce themselves as ttyUSB. Put all the possibilities in a list
+def potentialDevices():
+	return [dev for dev in os.listdir("/dev") if dev.startswith(("ttyACM", "ttyUSB", "tty.usbmodem"))]
+
 # Root menu
 @app.route('/')
 def root_menu():
 	global rc
 	if rc is None:
-		# Roboclaw directly connected on USB usually show up as /dev/ttyACM0
-		# and sometimes /dev/ttyACM1
-		acmList = [dev for dev in os.listdir("/dev") if dev.startswith("ttyACM")]
-		for acm in acmList:
-			newrc = Roboclaw("/dev/"+acm, 115200, 0.01, 3)
+		for device in potentialDevices():
+			newrc = Roboclaw("/dev/"+device, 115200, 0.01, 3)
 			if newrc.Open():
 				rc = newrc
 				break
@@ -136,14 +140,13 @@ def root_menu():
 
 	return render_template("root_menu.html", display=displayMenu, address=rcAddr)
 
-
 # Connect menu lets the user specify serial port parameters for creating
 # a Roboclaw object
 @app.route('/connect', methods=['GET', 'POST'])
 def connect_menu():
 	global rc
 	if request.method == 'GET':
-		return render_template("connect_menu.html")
+		return render_template("connect_menu.html", potentialDevices=potentialDevices())
 	elif request.method == 'POST':
 		# TODO sanity validation of these values from the HTML form
 		portName = request.form['port']
