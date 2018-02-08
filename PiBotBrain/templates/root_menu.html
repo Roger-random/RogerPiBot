@@ -14,6 +14,8 @@
 			<a href="{{url_for('basic_motor', address=address)}}"><h1>Basic Motor Test</h1></a>
 			<hr/>
 			<a href="{{url_for('drive_control', address=address)}}"><h1>Drive 2-Wheel Robot</h1></a>
+			<hr/>
+			<a href="{{url_for('call_shutdown')}}">Shutdown</a>
 		{% endif %}
 		<hr/>
 	{% endif %}

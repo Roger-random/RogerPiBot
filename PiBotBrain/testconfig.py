@@ -2,6 +2,7 @@
 
 from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
 import os
+from subprocess import call
 from roboclaw import Roboclaw
 from roboclaw_stub import Roboclaw_stub
 
@@ -617,3 +618,12 @@ def basic_motor():
 			return redirect(url_for('basic_motor',address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
+
+@app.route('/shutdown')
+def call_shutdown():
+	r = call("systemctl poweroff", shell=True)
+	if r == 0:
+		flash("Shutting down...", successCategory)
+	else:
+		flash("Shutdown attempt failed with error {0}".format(r), errorCategory)
+	return redirect(url_for('root_menu'))
