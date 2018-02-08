@@ -102,7 +102,7 @@ class Roboclaw_stub:
 		return (1, self.encoderM2, 0)
 
 	def ReadVersion(self,address):
-		return (1, "RoboClaw API Test Stub")
+		return (1, "TEST STUB API")
 
 	def SetEncM1(self,address,cnt):
 		self.m1move = None
