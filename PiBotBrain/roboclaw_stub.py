@@ -115,11 +115,17 @@ class Roboclaw_stub:
 		return True
 
 	def SetM1VelocityPID(self,address,p,i,d,qpps):
-		self.vpm1 = p, self.vim1 = i, self.vdm1 = d, self.vqppsm1 = qpps
+		self.vpm1 = p
+		self.vim1 = i
+		self.vdm1 = d
+		self.vqppsm1 = qpps
 		return True
 
 	def SetM2VelocityPID(self,address,p,i,d,qpps):
-		self.vpm2 = p, self.vim2 = i, self.vdm2 = d, self.vqppsm2 = qpps
+		self.vpm2 = p
+		self.vim2 = i
+		self.vdm2 = d
+		self.vqppsm2 = qpps
 		return True
 
 	def SpeedM1M2(self,address,m1,m2):
