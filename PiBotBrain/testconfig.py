@@ -266,7 +266,7 @@ def stop():
 		writeResult(rc.ForwardM1(rcAddr, 0), "Stop motor 1")
 		writeResult(rc.ForwardM2(rcAddr, 0), "Stop motor 2")
 
-		return render_template("stop.html", rcAddr=rcAddr)
+		return redirect(url_for('root_menu', address=rcAddr))
 	except ValueError as ve:
 		return redirect(url_for('root_menu'))
 

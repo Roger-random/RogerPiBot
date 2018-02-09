@@ -1,5 +1,0 @@
-{% extends "layout.html" %}
-{% block body %}
-	<p>Stop commands sent to both motors at Roboclaw address {{rcAddr}} ({{"0x%x" | format(rcAddr)}})</p>
-	<a href="{{url_for('root_menu', address=rcAddr)}}">Back to root menu</a>
-{% endblock %}
