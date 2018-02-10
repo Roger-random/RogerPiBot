@@ -41,8 +41,5 @@ flask run &
 ```
 @chromium-browser --kiosk http://localhost:5000/
 ```
-- Optional: In the same file, add a `#` at the beginning of xscreensaver line to comment it out and deactivate screen saver.
-```
-#@xscreensaver -no-splash
-```
+- Optional: Turn off screensaver https://www.raspberrypi.org/documentation/configuration/screensaver.md
 - Reboot
